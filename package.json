@@ -1,0 +1,36 @@
+{
+  "name": "app-biblico",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "dev:ts-node": "ts-node --esm src/index.ts",
+    "dev:web": "vite",
+    "build": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json && node scripts/ensure-dist-package.cjs",
+    "build:web": "tsc --noEmit && vite build",
+    "start": "node dist/index.js",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "bootstrap": "tsx src/bootstrap.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
+    "openai": "^6.33.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsx": "^4.19.2",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.3"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-web
+*.local
+.DS_Store
+.env
+.env.*
+
+# Editor configs pessoais (não commitar — tasks/extensions/launch ficam no repo)
+.cursor/
+.vscode/settings.json
+
+# PDFs de referência — grandes demais para GitHub (use Git LFS se necessário)
+docs/*.pdf
