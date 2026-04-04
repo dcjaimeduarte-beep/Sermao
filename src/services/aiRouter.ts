@@ -2,7 +2,24 @@ import OpenAI from "openai";
 import type { BiblicalAgent, GeneratedContent, SupportAgentConfig, UserRequest } from "@/domain";
 import { buildUserContext } from "@/utils/formatOutput";
 
+/**
+ * Em desenvolvimento (npm run dev:web): usa a API da OpenAI diretamente
+ * com a chave do arquivo .env (VITE_OPENAI_API_KEY).
+ *
+ * Em produção (build publicado): usa o proxy PHP do servidor
+ * (/proxy/v1) — a chave fica segura no servidor, nunca exposta no JS.
+ */
 function createClient(): OpenAI {
+  if (import.meta.env.PROD) {
+    // Produção: chama o proxy PHP — chave configurada em proxy/openai.php
+    return new OpenAI({
+      apiKey: "proxy", // valor ignorado — autenticação acontece no PHP
+      baseURL: "/proxy/v1",
+      dangerouslyAllowBrowser: true,
+    });
+  }
+
+  // Desenvolvimento: usa chave do .env diretamente
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error(

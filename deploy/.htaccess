@@ -1,0 +1,11 @@
+Options -MultiViews
+RewriteEngine On
+
+# ── Proxy de API (encaminha chamadas do app para o PHP seguro) ──
+# Captura /proxy/v1/* e envia para proxy/openai.php
+RewriteRule ^proxy/v1/.*$ /proxy/openai.php [QSA,L]
+
+# ── SPA — todas as rotas vão para o index.html ──
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]

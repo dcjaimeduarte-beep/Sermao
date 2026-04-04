@@ -13,7 +13,8 @@
     "start": "node dist/index.js",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "bootstrap": "tsx src/bootstrap.ts"
+    "bootstrap": "tsx src/bootstrap.ts",
+    "deploy:pack": "node scripts/package-deploy.cjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",

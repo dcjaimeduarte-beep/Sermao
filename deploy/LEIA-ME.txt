@@ -1,0 +1,119 @@
+================================================================
+  GERADOR DE CONTEÚDO BÍBLICO — GUIA DE INSTALAÇÃO
+  Versão para Hospedagem (LocalWeb, HostGator, KingHost etc.)
+================================================================
+
+O que é este aplicativo?
+--------------------------
+Uma ferramenta para pastores e líderes gerarem sermões, esboços
+e estudos bíblicos com profundidade exegética e aplicação pastoral,
+usando inteligência artificial (OpenAI GPT-4o).
+
+O que você precisa antes de instalar:
+---------------------------------------
+  1. Uma conta na OpenAI (platform.openai.com)
+  2. Uma chave de API da OpenAI (começa com sk-proj-...)
+  3. Créditos disponíveis na conta OpenAI
+  4. Uma hospedagem com suporte a PHP (cPanel / Apache)
+
+================================================================
+  PASSO 1 — CONFIGURAR SUA CHAVE DA OPENAI
+================================================================
+
+Abra o arquivo:  proxy/openai.php
+
+Encontre esta linha (linha 10 aproximadamente):
+
+  define('OPENAI_API_KEY', 'sk-proj-SUA_CHAVE_AQUI');
+
+Substitua  sk-proj-SUA_CHAVE_AQUI  pela sua chave real.
+
+Exemplo:
+  define('OPENAI_API_KEY', 'sk-proj-abc123xyz...');
+
+IMPORTANTE: Não compartilhe este arquivo com ninguém depois de
+inserir sua chave. A chave dá acesso à sua conta OpenAI.
+
+================================================================
+  PASSO 2 — FAZER UPLOAD DOS ARQUIVOS NO HOSTING
+================================================================
+
+VIA cPANEL (Gerenciador de Arquivos):
+  1. Acesse seu cPanel → clique em "Gerenciador de Arquivos"
+  2. Navegue até a pasta:  public_html/
+     (ou uma subpasta, ex.: public_html/sermao/)
+  3. Clique em "Upload" e envie TODOS os arquivos desta pasta:
+       .htaccess          ← obrigatório (arquivo oculto)
+       index.html
+       assets/            ← pasta completa
+       proxy/             ← pasta completa (com seu openai.php)
+
+  ⚠️  Atenção: o arquivo .htaccess começa com ponto (.) e pode
+  ficar oculto no Windows. No cPanel ele aparece normalmente.
+  Certifique-se de enviar ele também!
+
+VIA FTP (FileZilla ou similar):
+  1. Conecte ao servidor FTP da sua hospedagem
+  2. Navegue até /public_html/
+  3. Copie todos os arquivos desta pasta para lá
+
+================================================================
+  PASSO 3 — VERIFICAR SE ESTÁ FUNCIONANDO
+================================================================
+
+  1. Acesse seu domínio no navegador
+     Ex.: https://www.suaigreja.com.br/
+  2. O app deve abrir com o formulário de geração
+  3. Selecione uma passagem bíblica e clique em "Gerar Sermão"
+  4. O texto deve aparecer em tempo real (streaming)
+
+================================================================
+  SOLUÇÃO DE PROBLEMAS
+================================================================
+
+Erro "A chave da OpenAI não foi configurada":
+  → Verifique o arquivo proxy/openai.php e insira sua chave.
+
+Erro "Insufficient credits" ou "You exceeded your quota":
+  → Sua conta OpenAI não tem créditos. Acesse platform.openai.com
+    e adicione créditos (billing).
+
+O site abre mas o formulário não carrega:
+  → Verifique se o arquivo .htaccess foi enviado corretamente.
+  → Certifique-se de que o mod_rewrite está ativo no Apache
+    (padrão em LocalWeb/HostGator/KingHost).
+
+Página em branco ou erro 500:
+  → Verifique se o PHP está ativo na hospedagem (PHP 7.4+).
+  → Verifique as permissões: proxy/openai.php deve ser 644.
+
+================================================================
+  SOBRE A SEGURANÇA
+================================================================
+
+✓  Sua chave da OpenAI fica SOMENTE no servidor (proxy/openai.php)
+✓  O código JavaScript do app NÃO contém nenhuma chave
+✓  Cada geração passa pelo servidor PHP antes de chegar à OpenAI
+✓  Usuários do site não conseguem ver ou extrair sua chave
+
+================================================================
+  CUSTOS ESTIMADOS (OpenAI GPT-4o)
+================================================================
+
+  • Cada geração principal:   ~$0,03 – $0,08 USD
+  • Cada pesquisa especializada (3 agentes): ~$0,03 – $0,06 USD
+  • Total por uso completo:    ~$0,06 – $0,14 USD
+  • 100 gerações completas:   ~$6 – $14 USD
+
+Dica: monitore seu uso em platform.openai.com/usage
+
+================================================================
+  SUPORTE
+================================================================
+
+Em caso de dúvidas, entre em contato com quem preparou este
+pacote para você.
+
+Que Deus abençoe seu ministério da Palavra!
+
+================================================================
