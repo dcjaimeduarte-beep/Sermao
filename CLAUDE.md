@@ -191,3 +191,43 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Melhorar UX mobile
 
 ---
+
+### 2026-04-04 — Sessão 6: Botão "Gerar os 3 Tipos" — Geração Paralela Simultânea
+
+**O que foi feito:**
+
+**Nova função `runAllMainAgents()` em `aiRouter.ts`:**
+- Executa sermonAgent, outlineAgent e studyAgent em paralelo sem streaming
+- Usa `Promise.all()` com `gpt-4o`, max_tokens 6000 por agente
+- Retorna `GeneratedContent[]` com os 3 resultados
+
+**Nova função `masterAgentAll()` em `masterAgent.ts`:**
+- Retorna `{ agents: [sermonAgent, outlineAgent, studyAgent], apoio: [Exegeta, Teólogo] }`
+- Agentes de apoio compartilhados entre os 3 tipos
+
+**`handleGerarTodos()` no componente:**
+- Dispara `Promise.all([runAllMainAgents(...), runSupportAgents(...)])` — 5 chamadas em paralelo
+- Total de tokens por geração: ~3× mais que geração simples (custo maior, mas tudo de uma vez)
+
+**Componente `AllTypesResult`:**
+- Painel com abas: 🎙️ Sermão | 📝 Esboço | 📖 Estudo Bíblico
+- Footer personalizado por aba (tipo correto)
+- Pesquisa Especializada compartilhada abaixo (Exegeta + Teólogo)
+- Botões Copiar (por aba) e Nova Geração
+
+**UI atualizada:**
+- Botão "✦ Gerar os 3 Tipos" ao lado do botão "Gerar [tipo]"
+- Loading visual com badges dos 3 tipos enquanto gera em paralelo
+- CSS: `.at-panel`, `.at-tabs`, `.at-tab`, `.at-loading-card`, `.sgf-submit-all`
+- `.sgf-actions` agora flexível em coluna para acomodar os 2 botões
+
+**Deploy:** `sermao-deploy.zip` regenerado e pronto para upload.
+
+**Estado atual:** App com geração individual e geração simultânea dos 3 tipos. Build e push feitos. Zip pronto.
+
+**Próximos passos sugeridos:**
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+- Melhorar UX mobile
+
+---
