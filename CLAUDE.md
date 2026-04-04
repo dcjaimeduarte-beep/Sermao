@@ -161,6 +161,33 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Adicionar modo de impressão / exportar para PDF
 - Adicionar histórico de sermões gerados (localStorage)
 - Considerar indexação dos PDFs da pasta `docs/` para enriquecer o contexto dos agentes
-- Deploy (Vercel ou Netlify)
+
+---
+
+### 2026-04-03 — Sessão 5: Deploy na LocalWeb + Passagem Bíblica Opcional
+
+**Deploy seguro na LocalWeb:**
+- `proxy/openai.php` — proxy PHP que mantém a chave da OpenAI no servidor (nunca exposta no JS)
+- `aiRouter.ts` — detecta `import.meta.env.PROD`: em produção usa `/proxy/v1`, em dev usa chave do `.env`
+- `deploy/.htaccess` — rewrite rules para SPA + proxy PHP
+- `deploy/LEIA-ME.txt` — guia de instalação em português para os irmãos da igreja
+- `scripts/package-deploy.cjs` — script que faz build + empacota `sermao-deploy.zip` automaticamente
+- Comando `npm run deploy:pack` adicionado ao `package.json`
+- Deploy publicado em: `http://sermao.jdafotografia.com.br` (subdomínio na LocalWeb, pasta `public_html/sermao-deploy`)
+- Subdomínio configurado como "Conteúdo de pasta" na LocalWeb apontando para `public_html/sermao-deploy`
+
+**Passagem bíblica opcional:**
+- Toggle "Com passagem / Sem passagem" na seção de passagem bíblica
+- Sem passagem: agentes buscam versículos relevantes pelo tema e contexto informados
+- Com passagem: funciona como antes — exegese completa do original
+- Validação atualizada: aceita tema OU passagem (não exige os dois)
+- Output e rodapé mostram tema quando não há passagem definida
+
+**Estado atual:** App publicado em `sermao.jdafotografia.com.br`, pipeline multi-agente funcionando, geração por tema livre ou por passagem específica.
+
+**Próximos passos sugeridos:**
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+- Melhorar UX mobile
 
 ---
