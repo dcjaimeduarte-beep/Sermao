@@ -1,0 +1,175 @@
+<?php
+// ================================================================
+//  GERADOR DE CONTEÚDO BÍBLICO — Proxy Seguro para OpenAI
+// ================================================================
+//
+//  1. Substitua SUA_CHAVE_AQUI pela sua chave real (sk-proj-...)
+//  2. Ajuste ALLOWED_ORIGINS com os domínios do seu site
+//  3. Salve como proxy/openai.php no servidor
+//
+// ================================================================
+
+define('OPENAI_API_KEY', 'sk-proj-SUA_CHAVE_AQUI');
+
+// Domínios autorizados (sem barra final). Ajuste conforme seu domínio.
+define('ALLOWED_ORIGINS', implode(',', [
+    'http://sermao.jdafotografia.com.br',
+    'https://sermao.jdafotografia.com.br',
+    // 'http://localhost:5173',   // descomente apenas em testes locais
+]));
+
+// Segurança: limite máximo de tokens por requisição (previne gastos excessivos)
+define('MAX_TOKENS_CAP', 8000);
+
+// Rate limit: máximo de requisições por IP por janela de tempo
+define('RATE_LIMIT_MAX',    20);   // requisições permitidas
+define('RATE_LIMIT_WINDOW', 300);  // janela em segundos (5 minutos)
+
+// ================================================================
+//  NÃO EDITAR ABAIXO DESTA LINHA
+// ================================================================
+
+// ── 1. Verificação da chave ────────────────────────────────────
+if (OPENAI_API_KEY === 'sk-proj-SUA_CHAVE_AQUI' || empty(OPENAI_API_KEY)) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => [
+            'message' => 'Chave da OpenAI não configurada. Edite proxy/openai.php.',
+            'type'    => 'configuration_error',
+        ]
+    ]);
+    exit();
+}
+
+// ── 2. CORS — só aceita origens autorizadas ────────────────────
+$allowedOrigins = array_map('trim', explode(',', ALLOWED_ORIGINS));
+$origin         = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (!empty($origin) && !in_array($origin, $allowedOrigins, true)) {
+    http_response_code(403);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => ['message' => 'Origem não autorizada.', 'type' => 'forbidden']]);
+    exit();
+}
+
+$corsOrigin = !empty($origin) ? $origin : ($allowedOrigins[0] ?? '*');
+header('Content-Type: text/event-stream');
+header('Cache-Control: no-cache');
+header('X-Accel-Buffering: no');
+header('Access-Control-Allow-Origin: ' . $corsOrigin);
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Vary: Origin');
+
+// Pré-flight CORS
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit();
+}
+
+// ── 3. Apenas POST ─────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => ['message' => 'Método não permitido.']]);
+    exit();
+}
+
+// ── 4. Rate limiting por IP ────────────────────────────────────
+$ip      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$ipHash  = md5($ip);
+$tmpFile = sys_get_temp_dir() . '/sermao_rl_' . $ipHash . '.json';
+$now     = time();
+
+$rl = ['requests' => [], 'blocked_until' => 0];
+if (file_exists($tmpFile)) {
+    $rl = json_decode(file_get_contents($tmpFile), true) ?: $rl;
+}
+
+// Remove registros fora da janela
+$rl['requests'] = array_values(array_filter($rl['requests'], fn($t) => $t > $now - RATE_LIMIT_WINDOW));
+
+if (count($rl['requests']) >= RATE_LIMIT_MAX) {
+    http_response_code(429);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => [
+            'message' => 'Muitas requisições. Aguarde alguns minutos e tente novamente.',
+            'type'    => 'rate_limit_exceeded',
+        ]
+    ]);
+    exit();
+}
+
+$rl['requests'][] = $now;
+@file_put_contents($tmpFile, json_encode($rl), LOCK_EX);
+
+// ── 5. Validação e saneamento do body ─────────────────────────
+$rawBody = file_get_contents('php://input');
+
+if (empty($rawBody)) {
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => ['message' => 'Requisição vazia.']]);
+    exit();
+}
+
+$payload = json_decode($rawBody, true);
+
+if (!is_array($payload) || !isset($payload['messages']) || !is_array($payload['messages'])) {
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => ['message' => 'Formato de requisição inválido.']]);
+    exit();
+}
+
+// Forçar modelo permitido e limitar tokens (impede abusos de custo)
+$payload['model']      = 'gpt-4o';
+$payload['max_tokens'] = min((int)($payload['max_tokens'] ?? MAX_TOKENS_CAP), MAX_TOKENS_CAP);
+
+// Limitar número de mensagens (proteção contra prompt injection via body)
+if (count($payload['messages']) > 10) {
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => ['message' => 'Número de mensagens excede o limite.']]);
+    exit();
+}
+
+$safeBody = json_encode($payload);
+
+// ── 6. Encaminha para a OpenAI com streaming ───────────────────
+$ch = curl_init('https://api.openai.com/v1/chat/completions');
+
+curl_setopt($ch, CURLOPT_POST,           true);
+curl_setopt($ch, CURLOPT_POSTFIELDS,     $safeBody);
+curl_setopt($ch, CURLOPT_HTTPHEADER,     [
+    'Content-Type: application/json',
+    'Authorization: Bearer ' . OPENAI_API_KEY,
+]);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_TIMEOUT,        120);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $data) {
+    echo $data;
+    if (ob_get_level() > 0) ob_flush();
+    flush();
+    return strlen($data);
+});
+
+$success = curl_exec($ch);
+
+if (!$success) {
+    http_response_code(502);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => [
+            'message' => 'Erro ao conectar com a OpenAI: ' . curl_error($ch),
+            'type'    => 'proxy_error',
+        ]
+    ]);
+}
+
+curl_close($ch);
