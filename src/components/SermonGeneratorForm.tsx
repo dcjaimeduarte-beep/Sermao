@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AudienceType, ContentType, GeneratedContent, SermonStyle, UserRequest } from "@/domain";
 import { masterAgent, masterAgentAll } from "@/agents/masterAgent";
 import { runAgent, runAllMainAgents, runSupportAgents } from "@/services/aiRouter";
@@ -51,18 +51,64 @@ function buildTextoBase(livro: string, capitulo: string, versiculos: string): st
   return ver ? `${livro} ${cap}:${ver}` : `${livro} ${cap}`;
 }
 
-function renderInline(text: string): React.ReactNode[] {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/);
-  return parts.map((part, i) => {
+// ── Referências cruzadas bíblicas ──────────────────────────────────────────
+const BIBLE_BOOKS_PATTERN = [
+  "(?:1|2|3)\\s+Samuel", "(?:1|2|3)\\s+Reis", "(?:1|2|3)\\s+Crônicas",
+  "(?:1|2|3)\\s+Coríntios", "(?:1|2|3)\\s+Tessalonicenses",
+  "(?:1|2|3)\\s+Timóteo", "(?:1|2|3)\\s+Pedro",
+  "(?:1|2|3)\\s+João",
+  "Gênesis", "Êxodo", "Levítico", "Números", "Deuteronômio",
+  "Josué", "Juízes", "Rute", "Esdras", "Neemias", "Ester", "Jó",
+  "Salmos?", "Provérbios", "Eclesiastes", "Cânticos?(?:\\s+dos\\s+Cânticos)?",
+  "Isaías", "Jeremias", "Lamentações", "Ezequiel", "Daniel",
+  "Oséias", "Joel", "Amós", "Obadias", "Jonas", "Miquéias",
+  "Naum", "Habacuque", "Sofonias", "Ageu", "Zacarias", "Malaquias",
+  "Mateus", "Marcos", "Lucas", "João",
+  "Atos(?:\\s+dos\\s+Apóstolos)?", "Romanos",
+  "Gálatas", "Efésios", "Filipenses", "Colossenses",
+  "Tito", "Filemom", "Hebreus", "Tiago", "Judas", "Apocalipse",
+].join("|");
+
+const BIBLE_REF_RE = new RegExp(
+  `((?:${BIBLE_BOOKS_PATTERN})\\s+\\d+(?::\\d+(?:[–\\-]\\d+)?)?)`,
+  "gi"
+);
+
+function renderInline(text: string, onBibleRef?: (ref: string) => void): React.ReactNode[] {
+  // 1. Split by bold/italic markers
+  const boldItalicParts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/);
+
+  return boldItalicParts.flatMap((part, bi) => {
+    if (!part) return [];
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4)
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
+      return [<strong key={`b${bi}`}>{part.slice(2, -2)}</strong>];
     if (part.startsWith("*") && part.endsWith("*") && part.length > 2)
-      return <em key={i}>{part.slice(1, -1)}</em>;
-    return part;
+      return [<em key={`e${bi}`}>{part.slice(1, -1)}</em>];
+
+    if (!onBibleRef) return [part];
+
+    // 2. Within plain text, detect Bible references (capturing group → odd indices = refs)
+    const refParts = part.split(BIBLE_REF_RE);
+    return refParts.map((rp, ri) => {
+      if (!rp) return null;
+      if (ri % 2 === 1) {
+        return (
+          <button
+            key={`ref${bi}-${ri}`}
+            type="button"
+            className="bible-ref-link"
+            onClick={() => onBibleRef(rp)}
+          >
+            {rp}
+          </button>
+        );
+      }
+      return rp || null;
+    }).filter(Boolean) as React.ReactNode[];
   });
 }
 
-function renderSermonContent(text: string): React.ReactNode {
+function renderSermonContent(text: string, onBibleRef?: (ref: string) => void): React.ReactNode {
   const lines = text.split("\n");
   const nodes: React.ReactNode[] = [];
   let listItems: string[] = [];
@@ -73,7 +119,7 @@ function renderSermonContent(text: string): React.ReactNode {
     nodes.push(
       <ul key={key++} className="so-list">
         {listItems.map((item, i) => (
-          <li key={i}>{renderInline(item)}</li>
+          <li key={i}>{renderInline(item, onBibleRef)}</li>
         ))}
       </ul>
     );
@@ -83,16 +129,16 @@ function renderSermonContent(text: string): React.ReactNode {
   for (const line of lines) {
     if (line.startsWith("#### ")) {
       flushList();
-      nodes.push(<h4 key={key++} className="so-h4">{renderInline(line.slice(5))}</h4>);
+      nodes.push(<h4 key={key++} className="so-h4">{renderInline(line.slice(5), onBibleRef)}</h4>);
     } else if (line.startsWith("### ")) {
       flushList();
-      nodes.push(<h3 key={key++} className="so-h3">{renderInline(line.slice(4))}</h3>);
+      nodes.push(<h3 key={key++} className="so-h3">{renderInline(line.slice(4), onBibleRef)}</h3>);
     } else if (line.startsWith("## ")) {
       flushList();
-      nodes.push(<h2 key={key++} className="so-h2">{renderInline(line.slice(3))}</h2>);
+      nodes.push(<h2 key={key++} className="so-h2">{renderInline(line.slice(3), onBibleRef)}</h2>);
     } else if (line.startsWith("# ")) {
       flushList();
-      nodes.push(<h1 key={key++} className="so-h1">{renderInline(line.slice(2))}</h1>);
+      nodes.push(<h1 key={key++} className="so-h1">{renderInline(line.slice(2), onBibleRef)}</h1>);
     } else if (line.match(/^---+$/)) {
       flushList();
       nodes.push(<hr key={key++} className="so-divider" />);
@@ -108,11 +154,84 @@ function renderSermonContent(text: string): React.ReactNode {
       nodes.push(<div key={key++} className="so-gap" />);
     } else {
       flushList();
-      nodes.push(<p key={key++} className="so-p">{renderInline(line)}</p>);
+      nodes.push(<p key={key++} className="so-p">{renderInline(line, onBibleRef)}</p>);
     }
   }
   flushList();
   return <>{nodes}</>;
+}
+
+// ── Modal de passagem bíblica ───────────────────────────────────────────────
+function BiblePassageModal({ refText, onClose }: { refText: string; onClose: () => void }) {
+  const [passageText, setPassageText] = useState<string | null>(null);
+  const [reference, setReference] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setPassageText(null);
+    setReference(null);
+
+    const encoded = encodeURIComponent(refText);
+    fetch(`https://bible-api.com/${encoded}?translation=almeida`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setPassageText(data.text?.trim() ?? "");
+        setReference(data.reference ?? refText);
+      })
+      .catch(() =>
+        setError("Não foi possível carregar a passagem. Verifique a conexão e tente novamente.")
+      )
+      .finally(() => setLoading(false));
+  }, [refText]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="bm-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bm-modal" role="dialog" aria-modal="true" aria-label={refText}>
+        <div className="bm-header">
+          <div className="bm-title-row">
+            <span className="bm-ref-badge">📖</span>
+            <h2 className="bm-title">{reference ?? refText}</h2>
+          </div>
+          <button type="button" className="bm-close" onClick={onClose} aria-label="Fechar">✕</button>
+        </div>
+
+        <div className="bm-body">
+          {loading && (
+            <div className="bm-state">
+              <span className="sgf-spinner bm-spinner" />
+              <span>Carregando passagem…</span>
+            </div>
+          )}
+          {error && (
+            <div className="bm-state bm-error">
+              <span>⚠</span> {error}
+            </div>
+          )}
+          {passageText && !loading && (
+            <p className="bm-passage">{passageText}</p>
+          )}
+        </div>
+
+        <div className="bm-footer">
+          <span className="bm-source">Bíblia Almeida · bible-api.com</span>
+          <button type="button" className="bm-close-btn" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 interface FooterInfo {
@@ -175,7 +294,7 @@ function SermonFooter({ info }: { info: FooterInfo }) {
 
 type SupportResult = GeneratedContent & { label: string; icone: string };
 
-function SpecialistPanel({ results }: { results: SupportResult[] }) {
+function SpecialistPanel({ results, onBibleRef }: { results: SupportResult[]; onBibleRef?: (ref: string) => void }) {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -216,7 +335,7 @@ function SpecialistPanel({ results }: { results: SupportResult[] }) {
       <div className="sp-body">
         {results[activeTab] && (
           <div className="sp-content">
-            {renderSermonContent(results[activeTab].content)}
+            {renderSermonContent(results[activeTab].content, onBibleRef)}
           </div>
         )}
       </div>
@@ -267,9 +386,10 @@ interface AllTypesResultProps {
   apoio: SupportResult[] | null;
   footerInfo: FooterInfo;
   onNovo: () => void;
+  onBibleRef?: (ref: string) => void;
 }
 
-function AllTypesResult({ resultados, apoio, footerInfo, onNovo }: AllTypesResultProps) {
+function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: AllTypesResultProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -325,14 +445,14 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo }: AllTypesResul
         <div className="at-body">
           {resultados[activeTab] && (
             <div className="at-content">
-              {renderSermonContent(resultados[activeTab].content)}
+              {renderSermonContent(resultados[activeTab].content, onBibleRef)}
               <SermonFooter info={{ ...footerInfo, tipo: TODOS_TIPOS[activeTab].label }} />
             </div>
           )}
         </div>
       </section>
 
-      {apoio && apoio.length > 0 && <SpecialistPanel results={apoio} />}
+      {apoio && apoio.length > 0 && <SpecialistPanel results={apoio} onBibleRef={onBibleRef} />}
     </div>
   );
 }
@@ -368,6 +488,7 @@ export function SermonGeneratorForm() {
   const [resultadosTodos, setResultadosTodos] = useState<GeneratedContent[] | null>(null);
   const [pesquisaTodos, setPesquisaTodos] = useState<SupportResult[] | null>(null);
   const [footerInfoTodos, setFooterInfoTodos] = useState<FooterInfo | null>(null);
+  const [bibleRef, setBibleRef] = useState<string | null>(null);
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const specialistRef = useRef<HTMLDivElement>(null);
@@ -878,7 +999,7 @@ export function SermonGeneratorForm() {
             </div>
           </div>
           <div className="sgf-output-body">
-            {renderSermonContent(saida)}
+            {renderSermonContent(saida, setBibleRef)}
             {loading && <span className="sgf-cursor" aria-hidden="true" />}
             {footerInfo && !loading && <SermonFooter info={footerInfo} />}
           </div>
@@ -891,7 +1012,7 @@ export function SermonGeneratorForm() {
           <SpecialistLoadingPanel labels={apoioLabels} />
         )}
         {pesquisaEspecializada && pesquisaEspecializada.length > 0 && !loadingEspecialistas && (
-          <SpecialistPanel results={pesquisaEspecializada} />
+          <SpecialistPanel results={pesquisaEspecializada} onBibleRef={setBibleRef} />
         )}
       </div>
 
@@ -917,8 +1038,14 @@ export function SermonGeneratorForm() {
             apoio={pesquisaTodos}
             footerInfo={footerInfoTodos}
             onNovo={handleNovo}
+            onBibleRef={setBibleRef}
           />
         </div>
+      )}
+
+      {/* ── Modal de passagem bíblica ── */}
+      {bibleRef && (
+        <BiblePassageModal refText={bibleRef} onClose={() => setBibleRef(null)} />
       )}
     </div>
   );
