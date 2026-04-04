@@ -231,3 +231,38 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Melhorar UX mobile
 
 ---
+
+### 2026-04-04 — Sessão 7: Referências Bíblicas Clicáveis + Segurança do Proxy
+
+**Referências bíblicas como links clicáveis:**
+- `BIBLE_REF_RE`: regex que detecta referências PT no texto gerado (ex: João 3:16, Romanos 8:28)
+- `renderInline()` estendido: detecta refs e renderiza como botões clicáveis com `className="bible-ref-link"`
+- `BiblePassageModal`: busca passagem em `bible-api.com` (tradução Almeida, gratuita)
+- Fecha com Esc, clique fora ou botão "Fechar"
+- Funciona no conteúdo principal, Pesquisa Especializada e painel "Gerar os 3 Tipos"
+- Mobile: bottom sheet (sobe de baixo da tela)
+
+**Bug corrigido — página em branco em produção:**
+- Causa: `[–\-]` no regex era interpretado como range inválido (en-dash > hyphen) em alguns browsers → `SyntaxError` na inicialização do módulo = página em branco
+- Correção: `[-–]` (hífen PRIMEIRO na classe = sempre literal), flag `g` removido (desnecessário para `split()`), `try-catch` defensivo adicionado
+
+**Segurança do proxy (`proxy/openai.php`):**
+- `Access-Control-Allow-Origin`: restrito a `sermao.jdafotografia.com.br` (não mais `*`)
+- Rate limiting: 20 req/IP a cada 5 minutos (file-based em `sys_get_temp_dir()`)
+- Validação de body: rejeita JSON inválido, sem `messages`, ou com >10 mensagens
+- Modelo forçado para `gpt-4o` (impede override) e `max_tokens` limitado a 8000
+- `SSL_VERIFYPEER` ativo, resposta 204 no CORS preflight
+
+**Fluxo correto de deploy:**
+1. Editar `proxy/openai.php` linha 12 com chave real
+2. `npm run deploy:pack` — gera `sermao-deploy.zip` com chave incluída
+3. Subir zip no servidor, sobrescrevendo arquivos antigos
+
+**Estado atual:** Build limpo, zip gerado, 3 commits pendentes de push (rede instável). Proxy seguro. Usuário precisa inserir chave no `proxy/openai.php` local antes de rodar `deploy:pack`.
+
+**Próximos passos sugeridos:**
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+- Melhorar UX mobile
+
+---
