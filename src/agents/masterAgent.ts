@@ -62,3 +62,14 @@ export function masterAgent(request: UserRequest): RoutedAgents {
 
   return { principal, apoio };
 }
+
+/** Retorna os 3 agentes principais + agentes de apoio compartilhados para geração simultânea. */
+export function masterAgentAll(): { agents: BiblicalAgent[]; apoio: SupportAgentConfig[] } {
+  return {
+    agents: [sermonAgent, outlineAgent, studyAgent],
+    apoio: [
+      makeSupport(studyAgent, exegesisResearchPrompt, "Exegeta Bíblico", "🔍"),
+      makeSupport(theologyReviewAgent, theologicalInsightsPrompt, "Teólogo", "📖"),
+    ],
+  };
+}

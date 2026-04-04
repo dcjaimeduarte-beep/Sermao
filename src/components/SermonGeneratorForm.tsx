@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { AudienceType, ContentType, GeneratedContent, SermonStyle, UserRequest } from "@/domain";
-import { masterAgent } from "@/agents/masterAgent";
-import { runAgent, runSupportAgents } from "@/services/aiRouter";
+import { masterAgent, masterAgentAll } from "@/agents/masterAgent";
+import { runAgent, runAllMainAgents, runSupportAgents } from "@/services/aiRouter";
 import { BIBLE_BOOKS_PT } from "@/data/bibleBooks.pt";
 
 const CONTENT_TYPE_OPTIONS: { value: ContentType; label: string; desc: string }[] = [
@@ -256,6 +256,87 @@ function SpecialistLoadingPanel({ labels }: { labels: Array<{ label: string; ico
   );
 }
 
+const TODOS_TIPOS = [
+  { label: "Sermão", icon: "🎙️" },
+  { label: "Esboço", icon: "📝" },
+  { label: "Estudo Bíblico", icon: "📖" },
+];
+
+interface AllTypesResultProps {
+  resultados: GeneratedContent[];
+  apoio: SupportResult[] | null;
+  footerInfo: FooterInfo;
+  onNovo: () => void;
+}
+
+function AllTypesResult({ resultados, apoio, footerInfo, onNovo }: AllTypesResultProps) {
+  const [activeTab, setActiveTab] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    const content = resultados[activeTab]?.content;
+    if (!content) return;
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
+
+  return (
+    <div className="at-wrap">
+      <section className="at-panel">
+        <div className="at-header">
+          <div className="at-meta">
+            <span className="at-badge">✦ 3 Tipos Gerados</span>
+            <span className="at-ref">{footerInfo.passagem}</span>
+          </div>
+          <div className="at-actions">
+            <button
+              type="button"
+              className={`sgf-action-btn${copied ? " is-copied" : ""}`}
+              onClick={handleCopy}
+            >
+              {copied ? "✓ Copiado" : "Copiar"}
+            </button>
+            <button
+              type="button"
+              className="sgf-action-btn sgf-action-btn-secondary"
+              onClick={onNovo}
+            >
+              Nova geração
+            </button>
+          </div>
+        </div>
+
+        <div className="at-tabs">
+          {TODOS_TIPOS.map((tipo, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`at-tab${activeTab === i ? " is-active" : ""}`}
+              onClick={() => setActiveTab(i)}
+            >
+              <span className="at-tab-icon">{tipo.icon}</span>
+              <span className="at-tab-label">{tipo.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="at-body">
+          {resultados[activeTab] && (
+            <div className="at-content">
+              {renderSermonContent(resultados[activeTab].content)}
+              <SermonFooter info={{ ...footerInfo, tipo: TODOS_TIPOS[activeTab].label }} />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {apoio && apoio.length > 0 && <SpecialistPanel results={apoio} />}
+    </div>
+  );
+}
+
 export function SermonGeneratorForm() {
   const [tipoConteudo, setTipoConteudo] = useState<ContentType>("sermao");
   const [usarPassagem, setUsarPassagem] = useState(false);
@@ -277,15 +358,20 @@ export function SermonGeneratorForm() {
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
   const [loadingEspecialistas, setLoadingEspecialistas] = useState(false);
+  const [loadingTodos, setLoadingTodos] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [saida, setSaida] = useState<string | null>(null);
   const [footerInfo, setFooterInfo] = useState<FooterInfo | null>(null);
   const [pesquisaEspecializada, setPesquisaEspecializada] = useState<SupportResult[] | null>(null);
   const [apoioLabels, setApoioLabels] = useState<Array<{ label: string; icone: string }>>([]);
   const [copied, setCopied] = useState(false);
+  const [resultadosTodos, setResultadosTodos] = useState<GeneratedContent[] | null>(null);
+  const [pesquisaTodos, setPesquisaTodos] = useState<SupportResult[] | null>(null);
+  const [footerInfoTodos, setFooterInfoTodos] = useState<FooterInfo | null>(null);
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const specialistRef = useRef<HTMLDivElement>(null);
+  const todosRef = useRef<HTMLDivElement>(null);
 
   const textoBasePreview = useMemo(
     () => buildTextoBase(livro, capitulo, versiculos),
@@ -310,6 +396,60 @@ export function SermonGeneratorForm() {
     incluirApeloFinal,
   }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal]);
 
+  async function handleGerarTodos() {
+    setErro(null);
+    setSaida(null);
+    setFooterInfo(null);
+    setCopied(false);
+    setPesquisaEspecializada(null);
+    setApoioLabels([]);
+    setResultadosTodos(null);
+    setPesquisaTodos(null);
+    setFooterInfoTodos(null);
+
+    if (!textoBasePreview && !tema.trim()) {
+      setErro("Informe pelo menos um tema ou uma passagem bíblica.");
+      return;
+    }
+
+    setLoadingTodos(true);
+
+    try {
+      const request = montarPedido();
+      const { agents, apoio } = masterAgentAll();
+
+      const [todos, suportes] = await Promise.all([
+        runAllMainAgents(agents, request),
+        runSupportAgents(apoio, request),
+      ]);
+
+      setResultadosTodos(todos);
+      setPesquisaTodos(suportes);
+      setFooterInfoTodos({
+        passagem: textoBasePreview || tema.trim() || "Tema livre",
+        tipo: "Sermão · Esboço · Estudo",
+        publico,
+        duracao: duracaoMinutos,
+        profundidade,
+        pastor: pastor.trim(),
+        igreja: igreja.trim(),
+        data: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
+      });
+
+      setTimeout(() => {
+        todosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    } catch (err) {
+      setErro(
+        err instanceof Error
+          ? err.message
+          : "Falha ao gerar o conteúdo. Verifique a API key e tente novamente."
+      );
+    } finally {
+      setLoadingTodos(false);
+    }
+  }
+
   async function handleGerar(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
@@ -318,6 +458,9 @@ export function SermonGeneratorForm() {
     setCopied(false);
     setPesquisaEspecializada(null);
     setApoioLabels([]);
+    setResultadosTodos(null);
+    setPesquisaTodos(null);
+    setFooterInfoTodos(null);
 
     if (!textoBasePreview && !tema.trim()) {
       setErro("Informe pelo menos um tema ou uma passagem bíblica.");
@@ -408,6 +551,9 @@ export function SermonGeneratorForm() {
     setCopied(false);
     setPesquisaEspecializada(null);
     setApoioLabels([]);
+    setResultadosTodos(null);
+    setPesquisaTodos(null);
+    setFooterInfoTodos(null);
     setUsarPassagem(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -665,9 +811,9 @@ export function SermonGeneratorForm() {
           </div>
         </section>
 
-        {/* ── Botão ── */}
+        {/* ── Botões ── */}
         <div className="sgf-actions">
-          <button type="submit" className="sgf-submit" disabled={loading || loadingEspecialistas || (!textoBasePreview && !tema.trim())}>
+          <button type="submit" className="sgf-submit" disabled={loading || loadingTodos || loadingEspecialistas || (!textoBasePreview && !tema.trim())}>
             {loading ? (
               <span className="sgf-submit-loading">
                 <span className="sgf-spinner" />
@@ -675,6 +821,21 @@ export function SermonGeneratorForm() {
               </span>
             ) : (
               <>Gerar {tipoLabel}</>
+            )}
+          </button>
+          <button
+            type="button"
+            className="sgf-submit sgf-submit-all"
+            disabled={loading || loadingTodos || loadingEspecialistas || (!textoBasePreview && !tema.trim())}
+            onClick={handleGerarTodos}
+          >
+            {loadingTodos ? (
+              <span className="sgf-submit-loading">
+                <span className="sgf-spinner" />
+                Gerando os 3 tipos em paralelo…
+              </span>
+            ) : (
+              <>✦ Gerar os 3 Tipos</>
             )}
           </button>
         </div>
@@ -733,6 +894,32 @@ export function SermonGeneratorForm() {
           <SpecialistPanel results={pesquisaEspecializada} />
         )}
       </div>
+
+      {/* ── Resultado: Gerar os 3 Tipos ── */}
+      {loadingTodos && (
+        <div className="at-loading-wrap" ref={todosRef}>
+          <div className="at-loading-card">
+            <span className="sgf-spinner" />
+            <p className="at-loading-title">Gerando Sermão, Esboço e Estudo Bíblico…</p>
+            <p className="at-loading-sub">Os 3 tipos e os especialistas estão sendo gerados em paralelo. Isso pode levar alguns instantes.</p>
+            <div className="at-loading-agents">
+              {TODOS_TIPOS.map((t) => (
+                <span key={t.label} className="at-loading-agent-badge">{t.icon} {t.label}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {resultadosTodos && footerInfoTodos && !loadingTodos && (
+        <div ref={todosRef}>
+          <AllTypesResult
+            resultados={resultadosTodos}
+            apoio={pesquisaTodos}
+            footerInfo={footerInfoTodos}
+            onNovo={handleNovo}
+          />
+        </div>
+      )}
     </div>
   );
 }

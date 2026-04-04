@@ -56,7 +56,7 @@ export async function runAgent(
   let fullText = "";
 
   for await (const chunk of stream) {
-    const text = chunk.choices[0]?.delta?.content ?? "";
+    const text = chunk.choices?.[0]?.delta?.content ?? "";
     if (text) {
       fullText += text;
       onChunk?.(text);
@@ -109,4 +109,36 @@ export async function runSupportAgents(
 ): Promise<Array<GeneratedContent & { label: string; icone: string }>> {
   const client = createClient();
   return Promise.all(configs.map((cfg) => runSupportAgent(cfg, request, client)));
+}
+
+/** Executa os 3 agentes principais em paralelo (sem streaming). */
+export async function runAllMainAgents(
+  agents: BiblicalAgent[],
+  request: UserRequest
+): Promise<GeneratedContent[]> {
+  const client = createClient();
+  const userContext = buildUserContext(request);
+
+  return Promise.all(
+    agents.map(async (agent) => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        max_tokens: 6000,
+        messages: [
+          { role: "system", content: agent.promptBase },
+          {
+            role: "user",
+            content: `${userContext}\n\nGere o conteúdo completo agora, com toda a riqueza histórica, literária e aplicação pastoral em linguagem contemporânea.`,
+          },
+        ],
+        stream: false,
+      });
+
+      return {
+        agentId: agent.id,
+        agentName: agent.nome,
+        content: response.choices?.[0]?.message?.content ?? "",
+      };
+    })
+  );
 }
