@@ -69,9 +69,10 @@ const BIBLE_BOOKS_PATTERN = [
   "Tito", "Filemom", "Hebreus", "Tiago", "Judas", "Apocalipse",
 ].join("|");
 
+// Hyphen FIRST in class = always literal (safe across all browsers)
 const BIBLE_REF_RE = new RegExp(
-  `((?:${BIBLE_BOOKS_PATTERN})\\s+\\d+(?::\\d+(?:[–\\-]\\d+)?)?)`,
-  "gi"
+  `((?:${BIBLE_BOOKS_PATTERN})\\s+\\d+(?::\\d+(?:[-–]\\d+)?)?)`,
+  "i"
 );
 
 function renderInline(text: string, onBibleRef?: (ref: string) => void): React.ReactNode[] {
@@ -88,23 +89,27 @@ function renderInline(text: string, onBibleRef?: (ref: string) => void): React.R
     if (!onBibleRef) return [part];
 
     // 2. Within plain text, detect Bible references (capturing group → odd indices = refs)
-    const refParts = part.split(BIBLE_REF_RE);
-    return refParts.map((rp, ri) => {
-      if (!rp) return null;
-      if (ri % 2 === 1) {
-        return (
-          <button
-            key={`ref${bi}-${ri}`}
-            type="button"
-            className="bible-ref-link"
-            onClick={() => onBibleRef(rp)}
-          >
-            {rp}
-          </button>
-        );
-      }
-      return rp || null;
-    }).filter(Boolean) as React.ReactNode[];
+    try {
+      const refParts = part.split(BIBLE_REF_RE);
+      return refParts.map((rp, ri) => {
+        if (!rp) return null;
+        if (ri % 2 === 1) {
+          return (
+            <button
+              key={`ref${bi}-${ri}`}
+              type="button"
+              className="bible-ref-link"
+              onClick={() => onBibleRef(rp)}
+            >
+              {rp}
+            </button>
+          );
+        }
+        return rp || null;
+      }).filter(Boolean) as React.ReactNode[];
+    } catch {
+      return [part];
+    }
   });
 }
 
