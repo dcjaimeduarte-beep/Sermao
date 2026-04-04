@@ -12,9 +12,11 @@ import { buildUserContext } from "@/utils/formatOutput";
 function createClient(): OpenAI {
   if (import.meta.env.PROD) {
     // Produção: chama o proxy PHP — chave configurada em proxy/openai.php
+    // Usa URL absoluta (obrigatório pelo SDK da OpenAI)
+    const proxyBase = `${window.location.origin}/proxy/v1`;
     return new OpenAI({
       apiKey: "proxy", // valor ignorado — autenticação acontece no PHP
-      baseURL: "/proxy/v1",
+      baseURL: proxyBase,
       dangerouslyAllowBrowser: true,
     });
   }
