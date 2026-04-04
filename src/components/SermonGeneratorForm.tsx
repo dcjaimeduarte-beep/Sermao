@@ -258,9 +258,10 @@ function SpecialistLoadingPanel({ labels }: { labels: Array<{ label: string; ico
 
 export function SermonGeneratorForm() {
   const [tipoConteudo, setTipoConteudo] = useState<ContentType>("sermao");
-  const [livro, setLivro] = useState("João");
-  const [capitulo, setCapitulo] = useState("15");
-  const [versiculos, setVersiculos] = useState("1-8");
+  const [usarPassagem, setUsarPassagem] = useState(false);
+  const [livro, setLivro] = useState("");
+  const [capitulo, setCapitulo] = useState("");
+  const [versiculos, setVersiculos] = useState("");
   const [tema, setTema] = useState("");
   const [contexto, setContexto] = useState("");
   const [publico, setPublico] = useState<AudienceType>("misto");
@@ -318,8 +319,8 @@ export function SermonGeneratorForm() {
     setPesquisaEspecializada(null);
     setApoioLabels([]);
 
-    if (!textoBasePreview) {
-      setErro("Indique pelo menos o livro e o capítulo.");
+    if (!textoBasePreview && !tema.trim()) {
+      setErro("Informe pelo menos um tema ou uma passagem bíblica.");
       return;
     }
 
@@ -354,7 +355,7 @@ export function SermonGeneratorForm() {
         : tipoLabel;
 
       setFooterInfo({
-        passagem: textoBasePreview,
+        passagem: textoBasePreview || tema.trim() || "Tema livre",
         tipo: tipoSermaoLabel,
         publico,
         duracao: duracaoMinutos,
@@ -407,6 +408,7 @@ export function SermonGeneratorForm() {
     setCopied(false);
     setPesquisaEspecializada(null);
     setApoioLabels([]);
+    setUsarPassagem(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -458,41 +460,75 @@ export function SermonGeneratorForm() {
 
         {/* ── Passagem Bíblica ── */}
         <section className="sgf-section">
-          <div className="sgf-section-label">
-            <span className="sgf-step-num">1</span> Passagem bíblica
-          </div>
-          <div className="sgf-grid-3">
-            <label className="sgf-field sgf-col-2">
-              <span>Livro</span>
-              <select value={livro} onChange={(e) => setLivro(e.target.value)} required>
-                {BIBLE_BOOKS_PT.map((b) => (
-                  <option key={b} value={b}>{b}</option>
-                ))}
-              </select>
-            </label>
-            <label className="sgf-field">
-              <span>Capítulo</span>
+          <div className="sgf-section-label-row">
+            <span className="sgf-section-label">
+              <span className="sgf-step-num">1</span> Passagem bíblica
+              <em className="sgf-opcional"> (opcional)</em>
+            </span>
+            <label className="sgf-toggle">
               <input
-                type="number" min={1} max={150}
-                value={capitulo}
-                onChange={(e) => setCapitulo(e.target.value)}
-                required
+                type="checkbox"
+                checked={usarPassagem}
+                onChange={(e) => {
+                  setUsarPassagem(e.target.checked);
+                  if (!e.target.checked) {
+                    setLivro("");
+                    setCapitulo("");
+                    setVersiculos("");
+                  } else {
+                    setLivro("João");
+                    setCapitulo("1");
+                    setVersiculos("");
+                  }
+                }}
               />
-            </label>
-            <label className="sgf-field sgf-col-full">
-              <span>Versículos <em>(opcional, ex.: 1-8 ou 5)</em></span>
-              <input
-                type="text" inputMode="numeric"
-                placeholder="ex.: 1-8"
-                value={versiculos}
-                onChange={(e) => setVersiculos(e.target.value)}
-              />
+              <span className="sgf-toggle-track" />
+              <span className="sgf-toggle-label">
+                {usarPassagem ? "Com passagem específica" : "Sem passagem — gerar pelo tema"}
+              </span>
             </label>
           </div>
-          {textoBasePreview && (
+
+          {usarPassagem && (
+            <div className="sgf-grid-3">
+              <label className="sgf-field sgf-col-2">
+                <span>Livro</span>
+                <select value={livro} onChange={(e) => setLivro(e.target.value)}>
+                  {BIBLE_BOOKS_PT.map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="sgf-field">
+                <span>Capítulo</span>
+                <input
+                  type="number" min={1} max={150}
+                  value={capitulo}
+                  onChange={(e) => setCapitulo(e.target.value)}
+                />
+              </label>
+              <label className="sgf-field sgf-col-full">
+                <span>Versículos <em>(opcional, ex.: 1-8 ou 5)</em></span>
+                <input
+                  type="text" inputMode="numeric"
+                  placeholder="ex.: 1-8"
+                  value={versiculos}
+                  onChange={(e) => setVersiculos(e.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {textoBasePreview && usarPassagem && (
             <div className="sgf-passagem-badge">
               <span className="sgf-passagem-badge-icon">📖</span>
               <strong>{textoBasePreview}</strong>
+            </div>
+          )}
+
+          {!usarPassagem && (
+            <div className="sgf-passagem-hint">
+              Os agentes irão buscar passagens bíblicas relevantes com base no tema e contexto que você informar abaixo.
             </div>
           )}
         </section>
@@ -631,7 +667,7 @@ export function SermonGeneratorForm() {
 
         {/* ── Botão ── */}
         <div className="sgf-actions">
-          <button type="submit" className="sgf-submit" disabled={loading || loadingEspecialistas || !textoBasePreview}>
+          <button type="submit" className="sgf-submit" disabled={loading || loadingEspecialistas || (!textoBasePreview && !tema.trim())}>
             {loading ? (
               <span className="sgf-submit-loading">
                 <span className="sgf-spinner" />
@@ -657,7 +693,9 @@ export function SermonGeneratorForm() {
           <div className="sgf-output-header">
             <div className="sgf-output-meta">
               <span className="sgf-output-tag">{tipoLabel}</span>
-              <span className="sgf-output-ref">{textoBasePreview}</span>
+              {(textoBasePreview || tema.trim()) && (
+                <span className="sgf-output-ref">{textoBasePreview || tema.trim()}</span>
+              )}
             </div>
             <div className="sgf-output-actions">
               <button
