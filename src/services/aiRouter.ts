@@ -91,7 +91,7 @@ async function runSupportAgent(
     stream: false,
   });
 
-  const content = response.choices[0]?.message?.content ?? "";
+  const content = response.choices?.[0]?.message?.content ?? "";
 
   return {
     agentId: config.agent.id,
