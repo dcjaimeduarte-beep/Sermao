@@ -42,9 +42,10 @@ if (OPENAI_API_KEY === 'sk-proj-SUA_CHAVE_AQUI' || empty(OPENAI_API_KEY)) {
     exit();
 }
 
-// ── 2. CORS — só aceita origens autorizadas ────────────────────
+// ── 2. CORS — verifica origem ─────────────────────────────────
 $allowedOrigins = array_map('trim', explode(',', ALLOWED_ORIGINS));
-$origin         = $_SERVER['HTTP_ORIGIN'] ?? '';
+$origin         = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+$corsOrigin     = !empty($origin) ? $origin : $allowedOrigins[0];
 
 if (!empty($origin) && !in_array($origin, $allowedOrigins, true)) {
     http_response_code(403);
@@ -53,18 +54,13 @@ if (!empty($origin) && !in_array($origin, $allowedOrigins, true)) {
     exit();
 }
 
-$corsOrigin = !empty($origin) ? $origin : ($allowedOrigins[0] ?? '*');
-header('Content-Type: text/event-stream');
-header('Cache-Control: no-cache');
-header('X-Accel-Buffering: no');
-header('Access-Control-Allow-Origin: ' . $corsOrigin);
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Vary: Origin');
-
-// Pré-flight CORS
+// Pré-flight CORS (responde antes dos headers SSE)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
+    header('Access-Control-Allow-Origin: ' . $corsOrigin);
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Vary: Origin');
     exit();
 }
 
@@ -76,19 +72,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// ── 4. Rate limiting por IP ────────────────────────────────────
-$ip      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+// ── 4. Rate limiting por IP (compatível com PHP 7.0+) ──────────
+$ip      = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
 $ipHash  = md5($ip);
 $tmpFile = sys_get_temp_dir() . '/sermao_rl_' . $ipHash . '.json';
 $now     = time();
+$window  = $now - RATE_LIMIT_WINDOW;
 
-$rl = ['requests' => [], 'blocked_until' => 0];
+$rl = array('requests' => array());
 if (file_exists($tmpFile)) {
-    $rl = json_decode(file_get_contents($tmpFile), true) ?: $rl;
+    $decoded = json_decode(file_get_contents($tmpFile), true);
+    if (is_array($decoded)) $rl = $decoded;
 }
 
-// Remove registros fora da janela
-$rl['requests'] = array_values(array_filter($rl['requests'], fn($t) => $t > $now - RATE_LIMIT_WINDOW));
+// Remove registros fora da janela (sem arrow function — compatível PHP 7.0+)
+$filtered = array();
+foreach ($rl['requests'] as $t) {
+    if ($t > $window) $filtered[] = $t;
+}
+$rl['requests'] = $filtered;
 
 if (count($rl['requests']) >= RATE_LIMIT_MAX) {
     http_response_code(429);
@@ -126,9 +128,9 @@ if (!is_array($payload) || !isset($payload['messages']) || !is_array($payload['m
 
 // Forçar modelo permitido e limitar tokens (impede abusos de custo)
 $payload['model']      = 'gpt-4o';
-$payload['max_tokens'] = min((int)($payload['max_tokens'] ?? MAX_TOKENS_CAP), MAX_TOKENS_CAP);
+$payload['max_tokens'] = min((int)(isset($payload['max_tokens']) ? $payload['max_tokens'] : MAX_TOKENS_CAP), MAX_TOKENS_CAP);
 
-// Limitar número de mensagens (proteção contra prompt injection via body)
+// Limitar número de mensagens
 if (count($payload['messages']) > 10) {
     http_response_code(400);
     header('Content-Type: application/json');
@@ -138,7 +140,16 @@ if (count($payload['messages']) > 10) {
 
 $safeBody = json_encode($payload);
 
-// ── 6. Encaminha para a OpenAI com streaming ───────────────────
+// ── 6. Headers SSE — apenas aqui, após todas as validações ─────
+header('Content-Type: text/event-stream');
+header('Cache-Control: no-cache');
+header('X-Accel-Buffering: no');
+header('Access-Control-Allow-Origin: ' . $corsOrigin);
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Vary: Origin');
+
+// ── 7. Encaminha para a OpenAI com streaming ───────────────────
 $ch = curl_init('https://api.openai.com/v1/chat/completions');
 
 curl_setopt($ch, CURLOPT_POST,           true);

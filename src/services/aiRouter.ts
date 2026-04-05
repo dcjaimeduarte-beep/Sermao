@@ -55,12 +55,18 @@ export async function runAgent(
 
   let fullText = "";
 
-  for await (const chunk of stream) {
-    const text = chunk.choices?.[0]?.delta?.content ?? "";
-    if (text) {
-      fullText += text;
-      onChunk?.(text);
+  try {
+    for await (const chunk of stream) {
+      const text = chunk.choices?.[0]?.delta?.content ?? "";
+      if (text) {
+        fullText += text;
+        onChunk?.(text);
+      }
     }
+  } catch (streamErr) {
+    // Se o stream quebrar após já ter conteúdo parcial, retorna o que foi gerado
+    if (fullText.length > 0) return { agentId: agent.id, agentName: agent.nome, content: fullText };
+    throw streamErr;
   }
 
   return {
