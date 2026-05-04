@@ -316,11 +316,19 @@ function SpecialistPanel({ results, onBibleRef }: { results: SupportResult[]; on
             <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
           </svg>
-          <h2 className="sp-title">Pesquisa Especializada</h2>
+          <h2 className="sp-title">Fundação Exegética e Teológica</h2>
         </div>
         <p className="sp-subtitle">
-          Contribuições dos especialistas para aprofundar o estudo e a pregação
+          Material exclusivo dos especialistas — exegese do original, contexto histórico, paralelos bíblicos e análise teológica que fundamentam o conteúdo gerado acima
         </p>
+        <div className="sp-legend">
+          {results.map((r) => (
+            <span key={r.agentId} className="sp-legend-badge">
+              <span>{r.icone}</span>
+              <span className="sp-legend-label">{r.label}</span>
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="sp-tabs">
@@ -363,7 +371,7 @@ function SpecialistLoadingPanel({ labels }: { labels: Array<{ label: string; ico
             <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
           </svg>
-          <h2 className="sp-title">Pesquisa Especializada</h2>
+          <h2 className="sp-title">Fundação Exegética e Teológica</h2>
         </div>
         <p className="sp-subtitle">Consultando especialistas em paralelo…</p>
       </div>
@@ -506,7 +514,7 @@ export function SermonGeneratorForm() {
 
   const montarPedido = useCallback((): UserRequest => ({
     tipoConteudo,
-    tipoSermao: tipoConteudo === "sermao" ? tipoSermao : undefined,
+    tipoSermao, // sempre incluído — runAllMainAgents usa para o sermonAgent mesmo quando outro tipo está selecionado
     publico,
     duracaoMinutos: Math.max(5, Math.min(180, duracaoMinutos)),
     tema: tema.trim() || undefined,

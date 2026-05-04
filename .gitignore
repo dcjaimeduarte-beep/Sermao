@@ -15,3 +15,6 @@ docs/*.pdf
 
 # Pacote de deploy gerado automaticamente
 sermao-deploy.zip
+
+# Proxy com chave real — nunca commitar
+proxy/openai.php

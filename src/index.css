@@ -410,7 +410,12 @@ body { margin: 0; min-height: 100vh; }
 }
 
 /* ── Submit ── */
-.sgf-actions { padding-top: .25rem; }
+.sgf-actions {
+  padding-top: .25rem;
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
 .sgf-submit {
   font: inherit;
   font-size: .95rem;
@@ -425,7 +430,8 @@ body { margin: 0; min-height: 100vh; }
   display: inline-flex;
   align-items: center;
   gap: .6rem;
-  min-width: 14rem;
+  flex: 1;
+  min-width: 12rem;
   justify-content: center;
 }
 .sgf-submit:hover:not(:disabled) { background: var(--primary-hv); transform: translateY(-1px); }
@@ -683,6 +689,31 @@ body { margin: 0; min-height: 100vh; }
   margin: 0;
   font-size: .82rem;
   color: var(--text-3);
+  line-height: 1.5;
+}
+
+.sp-legend {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin-top: .6rem;
+}
+
+.sp-legend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .22rem .65rem;
+  background: var(--primary-lt);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: .76rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sp-legend-label {
+  font-size: .76rem;
 }
 
 /* Tabs */
@@ -944,12 +975,6 @@ body { margin: 0; min-height: 100vh; }
    GERAR OS 3 TIPOS — sgf-submit-all / at-*
 ═══════════════════════════════════════════ */
 
-.sgf-actions {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-}
-
 .sgf-submit-all {
   background: linear-gradient(135deg, #1a3a5c 0%, #2563a8 100%);
   border: 1.5px solid #3b7dd8;
@@ -1134,6 +1159,8 @@ body { margin: 0; min-height: 100vh; }
   .sgf-grid-2 { grid-template-columns: 1fr; }
   .sgf-output-body { padding: 1.25rem 1rem 1.5rem; }
   .sgf-output-header { flex-direction: column; align-items: flex-start; }
+  .sgf-actions { flex-direction: column; }
+  .sgf-submit { min-width: unset; }
 }
 @media (max-width: 380px) {
   .sgf-grid-3 { grid-template-columns: 1fr; }
