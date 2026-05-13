@@ -266,3 +266,54 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Melhorar UX mobile
 
 ---
+
+### 2026-05-13 — Sessão 8: Enriquecimento dos Prompts Principais (Sermão, Esboço, Estudo)
+
+**O que foi feito:**
+
+**Diagnóstico antes de qualquer mudança:**
+- Leitura completa de todos os arquivos de agentes e prompts
+- Identificação de lacunas: pontos rasas em bullet points, sem arco narrativo, sem diferenciação real entre tipos de sermão, subtópicos como placeholders, estudo sem progressão didática
+
+**Reescrita de `src/prompts/sermonPrompt.ts`:**
+- Arco narrativo explícito: Intro (tensão) → P1 (fundamenta) → P2 (aprofunda) → P3 (resolve) → Conclusão (síntese crescente)
+- Diferenciação estrutural real por tipo: Expositivo (bloco a bloco), Textual (palavra a palavra), Temático (argumento progressivo)
+- Exige desenvolvimento em parágrafos completos — não bullet points
+- Template de ilustração com estrutura narrativa: cenário + tensão + resolução
+- Nota de transição entre pontos
+- Aplicação com persona específica (não "você", mas "se você é pai ou mãe...")
+
+**Reescrita de `src/prompts/outlinePrompt.ts`:**
+- Princípio de coerência: cada ponto declara explicitamente como serve à proposição central
+- 3 subtópicos por ponto (a, b, c) com conteúdo real — 2-3 frases de explicação, não placeholders
+- Notas de transição entre pontos
+- Material de apoio expandido: advertências hermenêuticas, notas de pesquisa, variações por público, dica de ritmo, recursos complementares
+- Resumo visual do esboço para o pregador consultar durante a pregação
+
+**Reescrita de `src/prompts/studyPrompt.ts`:**
+- Princípio de progressão didática: Tópico 1 (fundamento) → 2 (aprofundamento) → 3 (desafio)
+- Nota para o Líder em cada tópico — o que saber antes de conduzir aquele ponto
+- Dinâmica sugerida por tópico (duplas, roda, silêncio individual)
+- Perguntas em duas camadas: diagnóstico (onde o participante está) + desafio (para onde precisa ir)
+- Perguntas progressivas: compreensão → reflexão pessoal → discussão em grupo
+- Oração estruturada em 4 movimentos: Louvor + Confissão + Petição + Compromisso
+- Recursos complementares para o líder aprofundar
+
+**Integração de palavras do original + traduções (todos os 3 prompts):**
+- Palavras-chave em hebraico (AT) ou grego (NT) integradas organicamente nos parágrafos de exposição
+- Versículo-âncora de cada ponto/tópico citado em ARA + tradução literal do original
+- Formato didático e natural — nunca em tabela ou seção separada
+
+**Deploy:**
+- 2 commits: `392d1c8` (enriquecimento) + `0d57bdc` (original + traduções)
+- Push para `origin/main` feito
+- `sermao-deploy.zip` (122 KB) gerado e pronto — subir apenas `assets/` e `index.html` no servidor (proxy não mudou)
+
+**Estado atual:** Prompts dos 3 agentes principais reescritos com profundidade real. Build limpo. Git e zip atualizados.
+
+**Próximos passos sugeridos:**
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+- Melhorar UX mobile
+
+---
