@@ -34,10 +34,17 @@ Liste 4 a 6 palavras ou expressões centrais do texto em hebraico (AT) ou grego 
 - **Elemento-chave:** a palavra, frase ou imagem que ancora o sentido da passagem
 
 ### Versículos Paralelos Essenciais
-Liste 4 a 6 passagens paralelas com uma frase explicando a relação de cada uma com o texto analisado. Inclua tanto passagens que confirmam quanto passagens que ampliam o sentido.
+Liste 4 a 6 passagens paralelas com uma frase explicando a relação de cada uma com o texto analisado. Inclua tanto passagens que confirmam quanto passagens que ampliam o sentido. **AMPLITUDE OBRIGATÓRIA:** nunca liste apenas passagens do mesmo livro ou do mesmo testamento. Cruce AT e NT. Para temas com passagens "canônicas" famosas, inclua passagens menos citadas que enriquecem o tema:
+- Dízimos/ofertas: além de Malaquias 3 → Gn 14:18-20, Dt 14:22-29, Pv 3:9-10, Mt 23:23, Lc 21:1-4, 2 Co 9:6-8, Hb 7:1-10
+- Oração: além de Mt 6 → Sl 62, Lc 18:1-8, Rm 8:26-27, Fp 4:6-7, Tg 5:16
+- Salvação: além de Jo 3:16 → Rm 3:21-26, Ef 2:8-9, Tt 3:4-7, 1 Pe 1:18-19
+- Casamento: além de Ef 5 → Gn 2:18-25, Pv 31, 1 Co 7, Ct 8:6-7
 
 ### Síntese Exegética
 Uma única frase que resume o que o texto quer dizer — o sentido original, no contexto original, para os destinatários originais.
+
+**INSTRUÇÃO ESPECIAL — QUANDO NÃO HÁ PASSAGEM ESPECÍFICA (geração por tema):**
+Se a passagem não foi informada e o conteúdo é gerado por tema, sua função muda: em vez de analisar uma passagem específica, identifique as 3 ou 4 passagens mais importantes da Escritura sobre o tema (de diferentes partes do cânon — AT e NT, lei, profetas, evangelhos, epístolas) e faça uma exegese breve de cada uma. Mostre como cada passagem ilumina o tema de um ângulo diferente. Nunca trabalhe apenas com a passagem mais conhecida sobre o tema.
 
 IMPORTANTE: Cite apenas o que é historicamente e exegeticamente fundamentado. Não invente dados históricos ou afirmações sobre palavras originais sem base sólida.
 `;
