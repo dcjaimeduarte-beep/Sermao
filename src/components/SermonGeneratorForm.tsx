@@ -802,7 +802,7 @@ export function SermonGeneratorForm() {
               <label className="sgf-field sgf-col-full">
                 <span>Versículos <em>(opcional, ex.: 1-8 ou 5)</em></span>
                 <input
-                  type="text" inputMode="numeric"
+                  type="text"
                   placeholder="ex.: 1-8"
                   value={versiculos}
                   onChange={(e) => setVersiculos(e.target.value)}
@@ -856,7 +856,7 @@ export function SermonGeneratorForm() {
                   <label className="sgf-field sgf-col-full">
                     <span>Versículos <em>(opcional)</em></span>
                     <input
-                      type="text" inputMode="numeric"
+                      type="text"
                       placeholder="ex.: 1-8"
                       value={versiculos2}
                       onChange={(e) => setVersiculos2(e.target.value)}
