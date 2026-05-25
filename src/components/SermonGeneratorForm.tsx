@@ -893,9 +893,9 @@ export function SermonGeneratorForm() {
             <span className="sgf-step-num">2</span> Configurações
           </div>
           <div className="sgf-grid-2">
-            {tipoConteudo === "sermao" && (
+            {(tipoConteudo === "sermao" || tipoConteudo === "esboco") && (
               <label className="sgf-field">
-                <span>Tipo de sermão</span>
+                <span>{tipoConteudo === "sermao" ? "Tipo de sermão" : "Tipo de esboço"}</span>
                 <select value={tipoSermao} onChange={(e) => setTipoSermao(e.target.value as SermonStyle)}>
                   {TIPO_SERMAO_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
