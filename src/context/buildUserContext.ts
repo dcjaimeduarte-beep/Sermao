@@ -49,8 +49,9 @@ PROFUNDIDADE TEOLÓGICA: ${profDesc}
 DURAÇÃO ESTIMADA: ${request.duracaoMinutos} minutos
 → Dimensione o volume de conteúdo proporcionalmente. Um sermão de 20 min tem menos pontos e desenvolvimento mais enxuto que um de 60 min.
 
-PASSAGEM BÍBLICA: ${request.textoBase ?? "não informada — o agente deve selecionar passagens relevantes com base no tema"}
-
+PASSAGEM BÍBLICA PRINCIPAL: ${request.textoBase ?? "não informada — selecione passagens relevantes com base no tema"}
+${request.textoBase2 ? `PASSAGEM BÍBLICA COMPLEMENTAR: ${request.textoBase2}
+→ Duas passagens foram informadas. Use-as em diálogo: uma fundamenta, a outra aprofunda, ou ambas convergem para a mesma verdade central. Mostre como se iluminam mutuamente. A passagem principal ancora o desenvolvimento; a complementar enriquece, confirma ou amplia.` : ""}
 TEMA OU TÍTULO SUGERIDO: ${request.tema ?? "não informado"}
 
 CONTEXTO PASTORAL: ${request.contextoGeracao?.trim() ? request.contextoGeracao.trim() : "não informado"}

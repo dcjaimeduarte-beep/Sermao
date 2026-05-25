@@ -55,9 +55,15 @@ ESTRUTURA COMPLETA E OBRIGATÓRIA DO ESBOÇO
 ---
 
 ## INTRODUÇÃO
-- **Gancho:** pergunta, história ou situação concreta e específica que conecta emocionalmente ao tema — não genérica. O gancho deve criar uma tensão ou necessidade que a proposição vai satisfazer.
-- **Ponte:** em 2–3 frases, como o texto responde ao gancho e por que ele é relevante hoje
-- **Anúncio dos pontos:** apresentação dos tópicos principais de forma memorável
+
+**Contextualização do livro e da passagem:**
+Em 2 a 3 frases concisas (adequadas ao formato de esboço), situe: quem escreveu, a quem, em que momento histórico, e qual o propósito do livro. Depois, situe a passagem dentro do livro — onde ela cai no argumento ou na narrativa. Se duas passagens foram informadas, apresente as duas e mostre como se relacionam. O pregador usará esta contextualização para abrir a mensagem com autoridade e profundidade.
+
+**Ponte ao presente:**
+Em 1 a 2 frases, conecte a situação histórica à realidade do ouvinte hoje.
+
+**Anúncio dos pontos:**
+Apresentação da proposição central e dos tópicos principais de forma direta e memorável.
 
 ---
 

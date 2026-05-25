@@ -52,15 +52,14 @@ ESTRUTURA COMPLETA E OBRIGATÓRIA DO ESTUDO
 
 ## INTRODUÇÃO
 
-**Situação real para abrir:**
-Em 2 a 3 frases, descreva uma situação do cotidiano contemporâneo que alguém no grupo provavelmente já viveu — algo concreto, não genérico. Esta situação deve criar um ponto de identificação emocional antes de abrir a Bíblia.
-*(ex.: "Pense numa semana em que você fez tudo certo — orou, leu a Bíblia, foi à reunião — mas ainda assim sentiu que Deus estava distante. O que você fez com esse sentimento?")*
-
-**Pergunta de abertura:**
-Uma pergunta do cotidiano que qualquer pessoa — crente madura ou novo convertido — consiga responder sem constrangimento. Deve conectar naturalmente ao tema do texto.
+**Contextualização do livro e da passagem:**
+Em 2 a 3 parágrafos acessíveis, apresente o contexto bíblico-histórico-literário da passagem: quem escreveu, a quem foi dirigido, em que momento histórico e espiritual, e qual o propósito central do livro. Depois, situe a passagem dentro do livro — onde ela cai no argumento ou na narrativa, o que vem antes e depois, e o que a torna especialmente significativa. Se duas passagens foram informadas, contextualize as duas e mostre como dialogam ou convergem. Use linguagem acessível — não acadêmica. O grupo precisa entender o cenário histórico para que o texto fale com autoridade.
 
 **Por que este texto importa agora:**
-2 a 3 frases específicas sobre a relevância desta passagem para a vida cristã atual. Evite o genérico "este texto é importante para nossa vida" — seja preciso sobre o que ele confronta, conforta ou revela.
+2 a 3 frases específicas sobre a relevância desta passagem para a vida cristã atual. Seja preciso sobre o que ela confronta, conforta ou revela — evite generalidades.
+
+**Pergunta de abertura:**
+Uma pergunta do cotidiano que qualquer pessoa consiga responder sem constrangimento — crente madura ou novo convertido. Deve fluir naturalmente do contexto apresentado e conectar ao tema do texto.
 
 ---
 

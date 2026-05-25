@@ -304,6 +304,31 @@ body { margin: 0; min-height: 100vh; }
   box-shadow: 0 0 0 3px rgba(122,98,69,.12);
 }
 
+/* Segunda passagem */
+.sgf-segunda-passagem-toggle { margin-top: .75rem; }
+.sgf-segunda-btn {
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  padding: .4rem .9rem;
+  font-size: .82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.sgf-segunda-btn:hover, .sgf-segunda-btn.is-active {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.sgf-segunda-passagem { margin-top: .75rem; }
+.sgf-passagem-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .6rem;
+}
+.sgf-passagem-badge--2 { opacity: .82; }
+
 /* Passagem badge */
 .sgf-passagem-badge {
   display: inline-flex;

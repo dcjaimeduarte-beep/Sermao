@@ -78,13 +78,16 @@ ESTRUTURA COMPLETA E OBRIGATÓRIA DO SERMÃO
 
 ## INTRODUÇÃO
 
-Escreva a introdução em texto corrido — não em bullet points. A introdução deve:
+Escreva a introdução em texto corrido — não em bullet points. A introdução deve ter três movimentos:
 
-**Abertura narrativa:** Abra com uma história real, situação concreta ou pergunta que crie envolvimento emocional imediato. Seja específico: nome do personagem (ou "um pai que conheço"), lugar, situação. Histórias vagas não funcionam. A abertura deve criar uma necessidade ou tensão que o texto vai resolver.
+**1. Contextualização do livro e da passagem:**
+Apresente em 2 a 3 parágrafos o contexto bíblico-literário da passagem — quem escreveu, a quem foi dirigido, em que momento histórico e espiritual, e qual o propósito central do livro. Depois, situe a passagem dentro desse livro: onde ela se encaixa no argumento ou na narrativa, o que vem antes e o que vem depois, e por que este texto específico é significativo nesse contexto. Se duas passagens foram informadas, contextualize as duas e mostre como se relacionam ou convergem. Este contexto não é introdução acadêmica — é o solo que faz o ouvinte entender por que este texto tem autoridade e relevância.
 
-**Ponte ao texto:** Em 1 ou 2 parágrafos, mostre como esse texto antigo fala diretamente à situação que você abriu. Não salte — construa a ponte com cuidado, deixando o ouvinte sentir que o texto foi escrito para ele.
+**2. Ponte ao presente:**
+Em 1 parágrafo, mostre como essa realidade histórica fala diretamente à vida do ouvinte hoje. O que o autor bíblico enfrentava que nós também enfrentamos? Qual tensão do texto é nossa tensão também?
 
-**Proposição e anúncio:** Enuncie claramente o tema central da mensagem e anuncie os pontos principais de forma memorável.
+**3. Proposição e anúncio:**
+Enuncie claramente o tema central da mensagem e anuncie os pontos principais de forma memorável e direta.
 
 ---
 

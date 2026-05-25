@@ -18,6 +18,7 @@ export interface UserRequest {
   duracaoMinutos: number;
   tema?: string;
   textoBase?: string;
+  textoBase2?: string;
   /** Notas, situação da igreja, objetivos pastorais — incluído no pedido ao modelo. */
   contextoGeracao?: string;
   profundidade?: "simples" | "media" | "profunda";

@@ -476,6 +476,10 @@ export function SermonGeneratorForm() {
   const [livro, setLivro] = useState("");
   const [capitulo, setCapitulo] = useState("");
   const [versiculos, setVersiculos] = useState("");
+  const [usarSegundaPassagem, setUsarSegundaPassagem] = useState(false);
+  const [livro2, setLivro2] = useState("");
+  const [capitulo2, setCapitulo2] = useState("");
+  const [versiculos2, setVersiculos2] = useState("");
   const [tema, setTema] = useState("");
   const [contexto, setContexto] = useState("");
   const [publico, setPublico] = useState<AudienceType>("misto");
@@ -512,6 +516,11 @@ export function SermonGeneratorForm() {
     [livro, capitulo, versiculos]
   );
 
+  const textoBase2Preview = useMemo(
+    () => buildTextoBase(livro2, capitulo2, versiculos2),
+    [livro2, capitulo2, versiculos2]
+  );
+
   const montarPedido = useCallback((): UserRequest => ({
     tipoConteudo,
     tipoSermao, // sempre incluído — runAllMainAgents usa para o sermonAgent mesmo quando outro tipo está selecionado
@@ -519,6 +528,7 @@ export function SermonGeneratorForm() {
     duracaoMinutos: Math.max(5, Math.min(180, duracaoMinutos)),
     tema: tema.trim() || undefined,
     textoBase: textoBasePreview || undefined,
+    textoBase2: (usarSegundaPassagem && textoBase2Preview) ? textoBase2Preview : undefined,
     contextoGeracao: [
       contexto.trim(),
       pastor.trim() ? `Pastor(a): ${pastor.trim()}` : "",
@@ -528,7 +538,7 @@ export function SermonGeneratorForm() {
     incluirContextoHistorico,
     incluirAplicacao,
     incluirApeloFinal,
-  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal]);
+  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, textoBase2Preview, usarSegundaPassagem, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal]);
 
   async function handleGerarTodos() {
     setErro(null);
@@ -799,11 +809,75 @@ export function SermonGeneratorForm() {
             </div>
           )}
 
-          {textoBasePreview && usarPassagem && (
-            <div className="sgf-passagem-badge">
-              <span className="sgf-passagem-badge-icon">📖</span>
-              <strong>{textoBasePreview}</strong>
-            </div>
+          {usarPassagem && (
+            <>
+              {/* Segunda passagem */}
+              <div className="sgf-segunda-passagem-toggle">
+                <button
+                  type="button"
+                  className={`sgf-segunda-btn${usarSegundaPassagem ? " is-active" : ""}`}
+                  onClick={() => {
+                    setUsarSegundaPassagem(!usarSegundaPassagem);
+                    if (usarSegundaPassagem) {
+                      setLivro2("");
+                      setCapitulo2("");
+                      setVersiculos2("");
+                    } else {
+                      setLivro2("Romanos");
+                      setCapitulo2("8");
+                      setVersiculos2("");
+                    }
+                  }}
+                >
+                  {usarSegundaPassagem ? "− Remover segunda passagem" : "+ Adicionar segunda passagem"}
+                </button>
+              </div>
+
+              {usarSegundaPassagem && (
+                <div className="sgf-grid-3 sgf-segunda-passagem">
+                  <label className="sgf-field sgf-col-2">
+                    <span>Livro <em>(2ª passagem)</em></span>
+                    <select value={livro2} onChange={(e) => setLivro2(e.target.value)}>
+                      {BIBLE_BOOKS_PT.map((b) => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="sgf-field">
+                    <span>Capítulo</span>
+                    <input
+                      type="number" min={1} max={150}
+                      value={capitulo2}
+                      onChange={(e) => setCapitulo2(e.target.value)}
+                    />
+                  </label>
+                  <label className="sgf-field sgf-col-full">
+                    <span>Versículos <em>(opcional)</em></span>
+                    <input
+                      type="text" inputMode="numeric"
+                      placeholder="ex.: 1-8"
+                      value={versiculos2}
+                      onChange={(e) => setVersiculos2(e.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
+
+              <div className="sgf-passagem-badge-row">
+                {textoBasePreview && (
+                  <div className="sgf-passagem-badge">
+                    <span className="sgf-passagem-badge-icon">📖</span>
+                    <strong>{textoBasePreview}</strong>
+                  </div>
+                )}
+                {usarSegundaPassagem && textoBase2Preview && (
+                  <div className="sgf-passagem-badge sgf-passagem-badge--2">
+                    <span className="sgf-passagem-badge-icon">📖</span>
+                    <strong>{textoBase2Preview}</strong>
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           {!usarPassagem && (
