@@ -11,23 +11,23 @@ import { sermonAgent } from "./sermonAgent";
 import { studyAgent } from "./studyAgent";
 import { theologyReviewAgent } from "./theologyReviewAgent";
 
+// Palavras inequivocamente ligadas a dar/ofertar/dízimo.
+// Termos genéricos como "serviço", "missão", "amor" foram removidos
+// pois acionariam o agente em temas não relacionados (ex.: serviço na igreja, missão evangelística).
 const STEWARDSHIP_KEYWORDS = [
-  "dízimo", "dizimo", "oferta", "ofertas", "ofertar", "dizimar",
+  "dízimo", "dizimo", "dízimos", "dizimos",
+  "oferta", "ofertas", "ofertar", "ofertório",
+  "dizimar",
   "generosidade", "generoso", "generosa",
   "mordomia", "mordomo",
-  "sacrifício", "sacrificio", "sacrificar",
-  "entrega", "entregar",
   "dádiva", "dadiva",
   "dar ao senhor", "dar a deus", "dar para deus",
-  "abundância", "abundancia",
-  "finanças", "financas", "dinheiro",
-  "serviço", "servico", "servir",
-  "amor ao próximo", "amor ao proximo",
-  "cuidado do próximo", "missão", "missao",
-  "altruísmo", "altruismo",
-  "desprendimento", "desprender",
-  "graça que transborda", "graca que transborda",
-  "coração aberto", "coracao aberto",
+  "dar com alegria",
+  "finanças e fé", "financas e fe",
+  "dinheiro e fé", "dinheiro e fe",
+  "dar dos bens", "dar do salário", "dar do salario",
+  "bênção financeira", "bencao financeira",
+  "prosperar para dar",
 ];
 
 function isGenerosityTheme(request: UserRequest): boolean {
