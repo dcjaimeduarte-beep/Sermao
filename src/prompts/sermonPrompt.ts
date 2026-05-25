@@ -114,16 +114,17 @@ Enuncie claramente o tema central da mensagem e anuncie os pontos principais de 
 ### I. [Título do Primeiro Ponto — forte, memorável, nascido do texto]
 *[Versículo(s) que sustentam este ponto — citar referência exata]*
 
-**Exposição:**
-Escreva em 2 a 3 parágrafos de texto corrido — como pregador de púlpito, não como comentarista bíblico. Cada parágrafo deve carregar três camadas integradas:
+**a) [Título do Primeiro Subtópico — o que este texto/bloco/palavra revela]**
+Escreva 1 parágrafo completo em texto corrido — como pregador de púlpito. O parágrafo deve integrar três camadas ao mesmo tempo: (1) o que o texto diz com precisão exegética, incluindo o original quando iluminar: *"O verbo grego aqui é* agapaō *— não sentimento passageiro, mas amor por decisão de aliança..."*; (2) virar-se para o ouvinte e falar com ele diretamente — "você", "nós", "sua vida"; (3) ancorar a verdade teológica numa experiência concreta e nomeável: não "Deus cuida" mas "isso significa que quando você acorda às 3 da manhã com aquele peso que não tem nome, Ele já estava lá."
+*→ Reflexão: [Pergunta direta ao ouvinte — específica, pessoal, sem escapatória. Ex.: "Onde na sua vida você tem tratado a fé como uma emoção que precisa aparecer antes de você agir?"]*
 
-*a) Exegese viva:* O que o autor bíblico quis dizer, com que palavras, num contexto específico. Analise frase a frase, versículo a versículo. Quando uma palavra do original iluminar o ponto, nomeie-a dentro do texto com naturalidade e explique por que ela muda tudo: *"O evangelista usa aqui o verbo grego* agapaō *— não sentimento passageiro, mas amor que você escolhe mesmo quando não sente. Paulo não está descrevendo uma emoção — está descrevendo uma decisão que você pode tomar agora."*
+**b) [Título do Segundo Subtópico — a implicação ou o aprofundamento]**
+Escreva 1 parágrafo completo em texto corrido — mais profundo que o subtópico anterior. Antecipe aqui a objeção real que o ouvinte carrega: *"Talvez você esteja pensando: 'Mas eu já tentei isso e não funcionou.' E é exatamente para essa exaustão que o texto continua..."* Responda com o próprio texto, não com argumentos externos. Mostre como a verdade do (a) se aprofunda ou se complica — o custo real, a beleza escondida, a dimensão que o ouvinte ainda não viu.
+*→ Reflexão: [Pergunta mais desafiadora — endereça uma crença ou padrão de comportamento concreto]*
 
-*b) Interpelação direta:* Dentro do mesmo parágrafo, vire-se para o ouvinte e fale com ele. Use "você", "nós", "sua vida". Antecipe a objeção real que ele carrega consigo e responda-a pastoralmente: *"E talvez você esteja pensando agora: 'Mas eu já tentei isso e não funcionou.' E o que este texto diz é exatamente para essa exaustão — não para quem ainda tem energia para tentar, mas para quem já não tem mais."*
-
-*c) Ancoragem emocional e concreta:* Aterrissse a verdade teológica numa experiência nomeável. Não "Deus é suficiente" — mas *"isso significa que quando o diagnóstico chegou e você não sabia como continuar de pé, não era fraqueza o que você sentia — era o exato lugar onde esta promessa foi escrita."*
-
-Os três devem aparecer integrados, não em seções separadas. Um parágrafo bem pregado explica, interpela e ancora ao mesmo tempo.
+**c) [Título do Terceiro Subtópico — a virada, o ponto de decisão ou a conexão com o evangelho]**
+Escreva 1 parágrafo completo em texto corrido — este é o subtópico de maior peso no ponto. Conecte com outra parte da Escritura que confirma ou amplifica a verdade, ou aponte para como ela converge no evangelho: onde Cristo carregou exatamente isso, ou onde a cruz responde exatamente a essa tensão. Feche o ponto com força — o ouvinte deve sentir que a verdade chegou no lugar certo.
+*→ Reflexão: [Pergunta que prepara o ouvinte para a aplicação e o conecta com o próximo ponto]*
 
 **Implicação teológica e pastoral:**
 Em 1 a 2 parágrafos, mostre o que essa verdade revela sobre Deus, sobre o ser humano e sobre a vida cristã — mas não fique na teologia abstrata. Leve a implicação até o chão da vida: o que muda quando uma pessoa realmente acredita nisso? Que medo perde a força? Que hábito se torna insustentável? Que esperança se torna possível? Conecte com a revelação bíblica mais ampla — onde mais a Escritura confirma ou amplifica este ensinamento?
@@ -150,8 +151,17 @@ Uma ação específica, com persona, prazo e contexto real. Não generalize.
 ### II. [Título do Segundo Ponto]
 *[Versículo(s) que sustentam este ponto]*
 
-**Exposição:**
-[2 a 3 parágrafos em texto corrido — mesma estrutura tríplice do Ponto I: exegese viva + interpelação direta + ancoragem emocional. Este ponto deve aprofundar ou complicar a verdade do Ponto I — as implicações ficam mais sérias, o custo mais claro, a beleza mais plena. Antecipe uma objeção diferente da do Ponto I.]
+**a) [Título do Primeiro Subtópico deste ponto — o que este bloco revela de novo]**
+[1 parágrafo em texto corrido — exegese viva + interpelação direta + ancoragem emocional. Este ponto aprofunda ou complica a verdade do Ponto I — as implicações ficam mais sérias, o custo mais visível, a beleza mais plena.]
+*→ Reflexão: [Pergunta específica — mais profunda que as do Ponto I]*
+
+**b) [Título do Segundo Subtópico — onde o texto endereça uma objeção diferente]**
+[1 parágrafo em texto corrido — antecipe uma objeção diferente da do Ponto I; responda com o texto. Mostre o que acontece quando o ouvinte tenta viver com a verdade do Ponto I mas esbarra nesta dificuldade.]
+*→ Reflexão: [Pergunta que incomoda de forma construtiva — sem resposta óbvia]*
+
+**c) [Título do Terceiro Subtópico — aprofundamento teológico ou conexão canônica]**
+[1 parágrafo em texto corrido — implicação teológica maior, conexão com outra passagem ou apontamento para o evangelho. Feche o ponto preparando o ouvinte para o clímax que vem no Ponto III.]
+*→ Reflexão: [Pergunta que cria expectativa e urgência para o próximo ponto]*
 
 **Implicação teológica e pastoral:**
 [1 a 2 parágrafos — mais desafiador que o Ponto I; as implicações práticas devem ser mais específicas e confrontadoras. Onde mais a Escritura confirma esta verdade?]
@@ -172,8 +182,17 @@ Uma ação específica, com persona, prazo e contexto real. Não generalize.
 ### III. [Título do Terceiro Ponto — o ponto que resolve e convoca]
 *[Versículo(s) que sustentam este ponto]*
 
-**Exposição:**
-[2 a 3 parágrafos em texto corrido — este é o clímax: a verdade mais plena, a promessa mais firme, o desafio mais claro. Exegese viva + interpelação direta + ancoragem emocional — no nível mais alto. Este ponto deve levar o ouvinte ao ponto de decisão, de entrega ou de adoração. A força deste ponto determina se o sermão vai ser lembrado ou esquecido.]
+**a) [Título do Primeiro Subtópico — a verdade mais plena chega]**
+[1 parágrafo em texto corrido — exegese no nível mais alto: a expressão mais rica do texto, a palavra do original mais reveladora, a verdade que os pontos anteriores construíram para chegar aqui. Interpelação direta: o ouvinte deve sentir que chegou ao cerne da mensagem.]
+*→ Reflexão: [A pergunta mais honesta do sermão — aquela que não permite evasão e exige uma resposta interior real]*
+
+**b) [Título do Segundo Subtópico — onde o evangelho responde]**
+[1 parágrafo em texto corrido — aponte para Cristo: onde Ele carregou exatamente o que este texto descreve, onde a cruz resolve exatamente a tensão que o sermão criou, onde a ressurreição promete exatamente o que o ouvinte precisa. Não termine um sermão bíblico sem mostrar onde ele dá no evangelho.]
+*→ Reflexão: [Pergunta que convida à fé, à entrega ou ao compromisso renovado]*
+
+**c) [Título do Terceiro Subtópico — a promessa e a convocação]**
+[1 parágrafo em texto corrido — a promessa mais firme do texto, ou a chamada mais clara à obediência e à fé. Este é o subtópico que o ouvinte vai lembrar na quinta-feira. Feche com força: a verdade que ficou sendo pregada ao longo de todo o sermão chega aqui no seu ponto mais alto.]
+*→ Reflexão: [A pergunta que leva ao ponto de decisão — a última e mais pesada de todo o sermão]*
 
 **Implicação teológica e pastoral:**
 [1 a 2 parágrafos — conecte com o evangelho: como essa verdade aponta para Cristo, para a cruz, para a ressurreição? A implicação pastoral mais profunda do sermão fica aqui.]
@@ -231,10 +250,12 @@ Convite evangelístico ou de renovação de compromisso, em texto corrido, com:
 DIRETRIZES OBRIGATÓRIAS DE QUALIDADE
 ═══════════════════════════════════════════
 
-✓ **Pregar, não apenas explicar:** cada parágrafo de exposição deve falar tanto com o texto quanto com o ouvinte
-✓ **Interpelação direta:** use "você" e "nós" dentro da exposição — não apenas nas seções de aplicação
-✓ **Antecipar objeções:** identifique a resistência real que o ouvinte carrega e responda-a com o texto dentro da exposição
-✓ **Ancoragem emocional:** toda verdade teológica deve tocar o chão da experiência — concreta, nomeável, reconhecível
+✓ **Formato misto obrigatório:** cada ponto principal (I, II, III) deve ter 3 subtópicos nomeados (a, b, c) com título próprio + parágrafo pregado + reflexão ao ouvinte — MAIS as seções pastorais separadas (implicação, ilustração, aplicação imediata, aplicação prática)
+✓ **Subtópicos com título real:** cada (a), (b), (c) deve ter um título declarativo que capture a ideia daquele subtópico — não "[explicação]" como placeholder
+✓ **Reflexão após cada subtópico:** cada (a), (b), (c) termina com uma pergunta direta e específica ao ouvinte — não genérica
+✓ **Pregar, não apenas explicar:** cada parágrafo de subtópico deve integrar exegese + interpelação direta ("você", "nós") + ancoragem emocional concreta
+✓ **Antecipar objeções:** o subtópico (b) de cada ponto deve incluir a objeção real que o ouvinte carrega e respondê-la com o texto
+✓ **Progressão por ponto:** cada ponto deve ser mais profundo e mais urgente que o anterior; o Ponto III é o clímax
 ✓ Siga rigorosamente as instruções do pedido: tipo de sermão, profundidade, público, duração e inclusões opcionais
 ✓ Escreva em TEXTO CORRIDO — o sermão é uma mensagem, não uma lista de bullet points
 ✓ Cada ponto deve ter Exposição + Implicação + Ilustração + Aplicação — com substância real, não placeholders
