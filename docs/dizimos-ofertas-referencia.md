@@ -17,16 +17,21 @@ Jacó promete dar o dízimo a Deus após a visão da escada. Contexto: Jacó est
 ### Levítico 27:30-33 — A lei do dízimo
 "Todo dízimo da terra, tanto da semente da terra como do fruto das árvores, é do Senhor; é consagrado ao Senhor." O dízimo não é "dado a Deus" — ele já é de Deus. O fiel o reconhece, não o cria. Detalhe: havia um processo de resgate (acréscimo de 20%) se o dono quisesse recuperar algo.
 
-### Números 18:21-32 — Dízimo para os levitas
-O dízimo era a provisão para a tribo de Levi, que não recebeu herança territorial. Os levitas, por sua vez, davam o dízimo do dízimo para os sacerdotes (v.26). Sistema de redistribuição dentro do povo de Deus — o dízimo é social e comunitário, não apenas "contribuição religiosa".
+### Os Três Tipos de Dízimo na Lei de Moisés — Distinção Essencial
 
-### Deuteronômio 14:22-29 — O dízimo festivo e o dízimo dos pobres
-Texto frequentemente ignorado: havia TRÊS dízimos diferentes no AT:
-1. **Dízimo levítico** (Nm 18) — provisão dos levitas
-2. **Dízimo festivo** (Dt 14:22-27) — para comer diante do Senhor nas festas
-3. **Dízimo trienal** (Dt 14:28-29) — a cada 3 anos, para o levita, o estrangeiro, o órfão e a viúva
+#### 1. Dízimo Levítico (ou Sagrado) — Números 18:21-24
+Destinado à sustentação da tribo de Levi e dos sacerdotes que serviam no tabernáculo/templo e não possuíam herança territorial. Os levitas davam o dízimo do dízimo para os sacerdotes (Nm 18:26). Era a provisão permanente para o ministério sagrado.
+- *Princípio:* sustentar quem serve a Deus em tempo integral não é favor — é obrigação do povo de Deus.
 
-Implicação: o sistema do AT era mais exigente e mais generoso do que se prega. Não era apenas 10% — era um sistema completo de redistribuição e celebração. O debate de "10% bruto ou líquido" é reducionista frente à complexidade do sistema original.
+#### 2. Dízimo das Festas — Deuteronômio 14:22-27
+Usado para custear a jornada anual a Jerusalém e as celebrações das festas religiosas. O israelita comia e celebrava diante do Senhor com esse dízimo. Se a distância fosse grande, podia converter em dinheiro e comprar "o que desejasse" em Jerusalém — incluindo "vinho e bebida forte" (Dt 14:26).
+- *Princípio:* dar a Deus inclui celebrar com alegria. A devoção não é só sobriedade — é festa na presença de Deus.
+
+#### 3. Dízimo dos Pobres (ou Trienal) — Deuteronômio 14:28-29
+Recolhido a cada três anos e depositado nas cidades para alimentar o levita, o estrangeiro, o órfão e a viúva. Um fundo de assistência social embutido no sistema do dízimo.
+- *Princípio:* o dízimo bíblico tem dimensão social obrigatória. Dar a Deus e ignorar o pobre é contradição — não fidelidade.
+
+**Implicação para a pregação:** o sistema AT era muito mais exigente e mais abrangente do que um simples "10%". Debates sobre "bruto ou líquido" são reducionistas. A questão maior é: meu dar alcança o ministério, a celebração e o necessitado?
 
 ### Neemias 10:37-39; 13:10-13 — A crise do dízimo em Israel
 Quando o povo deixou de trazer o dízimo, os levitas foram obrigados a ir trabalhar no campo para sobreviver, e o culto foi comprometido. Nehemias reorganizou os tesoureiros. Contexto importantíssimo para entender Malaquias 3 — não é texto isolado, é parte de uma crise institucional de apostasia.

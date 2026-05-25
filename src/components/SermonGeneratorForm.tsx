@@ -560,7 +560,7 @@ export function SermonGeneratorForm() {
 
     try {
       const request = montarPedido();
-      const { agents, apoio } = masterAgentAll();
+      const { agents, apoio } = masterAgentAll(request);
 
       const [todos, suportes] = await Promise.all([
         runAllMainAgents(agents, request),
