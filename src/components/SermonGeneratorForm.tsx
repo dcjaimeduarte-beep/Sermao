@@ -489,6 +489,7 @@ export function SermonGeneratorForm() {
   const [incluirContextoHistorico, setIncluirContextoHistorico] = useState(true);
   const [incluirAplicacao, setIncluirAplicacao] = useState(true);
   const [incluirApeloFinal, setIncluirApeloFinal] = useState(true);
+  const [incluirMordomia, setIncluirMordomia] = useState(false);
   const [pastor, setPastor] = useState("");
   const [igreja, setIgreja] = useState("");
 
@@ -538,7 +539,8 @@ export function SermonGeneratorForm() {
     incluirContextoHistorico,
     incluirAplicacao,
     incluirApeloFinal,
-  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, textoBase2Preview, usarSegundaPassagem, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal]);
+    incluirMordomia,
+  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, textoBase2Preview, usarSegundaPassagem, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal, incluirMordomia]);
 
   async function handleGerarTodos() {
     setErro(null);
@@ -1016,6 +1018,16 @@ export function SermonGeneratorForm() {
               <span className="sgf-check-box" />
               <span>Apelo final</span>
             </label>
+          </div>
+          <div className="sgf-checks-row sgf-checks-mordomia">
+            <label className="sgf-check sgf-check--mordomia">
+              <input type="checkbox" checked={incluirMordomia} onChange={(e) => setIncluirMordomia(e.target.checked)} />
+              <span className="sgf-check-box" />
+              <span>🤲 Perspectiva sobre dízimos, ofertas e generosidade</span>
+            </label>
+            {incluirMordomia && (
+              <span className="sgf-mordomia-hint">Ativa o agente especializado em mordomia cristã — enriquece com passagens sobre dar, generosidade e sustento do ministério.</span>
+            )}
           </div>
         </section>
 

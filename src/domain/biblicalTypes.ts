@@ -25,6 +25,7 @@ export interface UserRequest {
   incluirContextoHistorico?: boolean;
   incluirAplicacao?: boolean;
   incluirApeloFinal?: boolean;
+  incluirMordomia?: boolean;
 }
 
 export interface BiblicalAgent {

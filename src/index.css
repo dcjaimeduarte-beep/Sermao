@@ -434,6 +434,24 @@ body { margin: 0; min-height: 100vh; }
   display: block;
 }
 
+.sgf-checks-mordomia {
+  margin-top: .5rem;
+  padding-top: .75rem;
+  border-top: 1px dashed var(--border-2);
+  flex-direction: column;
+  gap: .35rem;
+}
+.sgf-check--mordomia {
+  color: var(--text-1);
+  font-weight: 500;
+}
+.sgf-mordomia-hint {
+  font-size: .8rem;
+  color: var(--text-3, #888);
+  padding-left: 1.6rem;
+  line-height: 1.4;
+}
+
 /* ── Submit ── */
 .sgf-actions {
   padding-top: .25rem;
