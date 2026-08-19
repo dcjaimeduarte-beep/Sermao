@@ -317,3 +317,36 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Melhorar UX mobile
 
 ---
+
+### 2026-08-19 — Sessão 9: Esboço com mais contexto, original e aplicação pessoal
+
+**O que foi feito:**
+- `outlinePrompt.ts` agora abre com **Solo do tópico** (mundo original, sentido da ideia na época, ponte ao ouvinte) — não mais introdução de duas frases
+- Cada ponto traz o **texto original da época** (hebraico/grego) + **transliteração pronunciável** + ARA + literal
+- Palavras-chave no formato `חֶסֶד — ḥesed (heb.)`, nunca só a forma latina
+- **Aplicação pessoal** por ponto (persona + o que o texto pede + passo da semana) e seção final com 3 perguntas e 2 gestos para casa
+- Instrução do `outline-agent` em `aiRouter.ts` alinhada
+
+**Estado atual:** Prompt de esboço enriquecido. Servidor de dev já rodando — gerar um esboço de teste para validar o tom.
+
+**Próximos passos sugeridos:**
+- Testar geração de esboço (com passagem e por tema)
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+
+---
+
+### 2026-08-19 — Sessão 10: Dízimos canônicos + aba Fundação + deploy
+
+**O que foi feito:**
+- Dízimos/ofertas/primícias: teologia do *ato* em toda a Escritura (dizimar, ofertar, primiciar), não só Malaquias 3
+- Detecção automática do tema + checkbox de mordomia
+- UI: Fundação Exegética e Teológica como aba (geração simples e “3 tipos”)
+- Pacote `sermao-deploy.zip` gerado para upload de `index.html` + `assets/`
+
+**Estado atual:** Código pronto para commit. No ar: substituir `index.html` e `assets/` em `public_html/sermao-deploy`.
+
+**Próximos passos sugeridos:**
+- Adicionar modo de impressão / exportar para PDF
+- Adicionar histórico de sermões gerados (localStorage)
+

@@ -299,37 +299,39 @@ function SermonFooter({ info }: { info: FooterInfo }) {
 
 type SupportResult = GeneratedContent & { label: string; icone: string };
 
-function SpecialistPanel({ results, onBibleRef }: { results: SupportResult[]; onBibleRef?: (ref: string) => void }) {
+function SpecialistPanel({ results, onBibleRef, embedded }: { results: SupportResult[]; onBibleRef?: (ref: string) => void; embedded?: boolean }) {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section className="sp-panel">
-      <div className="sp-header">
-        <div className="sp-title-row">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="28" height="28" className="sp-title-icon-svg" aria-hidden="true">
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" fill="currentColor" opacity=".12"/>
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" fill="currentColor" opacity=".22"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
-            <line x1="16" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="16" y1="19" x2="30" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-          </svg>
-          <h2 className="sp-title">Fundação Exegética e Teológica</h2>
+    <section className={`sp-panel${embedded ? " sp-embedded" : ""}`}>
+      {!embedded && (
+        <div className="sp-header">
+          <div className="sp-title-row">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="28" height="28" className="sp-title-icon-svg" aria-hidden="true">
+              <rect x="6" y="4" width="30" height="40" rx="3" ry="3" fill="currentColor" opacity=".12"/>
+              <rect x="6" y="4" width="30" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
+              <rect x="6" y="4" width="7" height="40" rx="3" ry="3" fill="currentColor" opacity=".22"/>
+              <rect x="6" y="4" width="7" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
+              <line x1="16" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="19" x2="30" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+            </svg>
+            <h2 className="sp-title">Fundação Exegética e Teológica</h2>
+          </div>
+          <p className="sp-subtitle">
+            Material exclusivo dos especialistas — exegese do original, contexto histórico, paralelos bíblicos e análise teológica que fundamentam o conteúdo gerado acima
+          </p>
+          <div className="sp-legend">
+            {results.map((r) => (
+              <span key={r.agentId} className="sp-legend-badge">
+                <span>{r.icone}</span>
+                <span className="sp-legend-label">{r.label}</span>
+              </span>
+            ))}
+          </div>
         </div>
-        <p className="sp-subtitle">
-          Material exclusivo dos especialistas — exegese do original, contexto histórico, paralelos bíblicos e análise teológica que fundamentam o conteúdo gerado acima
-        </p>
-        <div className="sp-legend">
-          {results.map((r) => (
-            <span key={r.agentId} className="sp-legend-badge">
-              <span>{r.icone}</span>
-              <span className="sp-legend-label">{r.label}</span>
-            </span>
-          ))}
-        </div>
-      </div>
+      )}
 
       <div className="sp-tabs">
         {results.map((r, i) => (
@@ -356,25 +358,30 @@ function SpecialistPanel({ results, onBibleRef }: { results: SupportResult[]; on
   );
 }
 
-function SpecialistLoadingPanel({ labels }: { labels: Array<{ label: string; icone: string }> }) {
+function SpecialistLoadingPanel({ labels, embedded }: { labels: Array<{ label: string; icone: string }>; embedded?: boolean }) {
   return (
-    <section className="sp-panel sp-panel-loading">
-      <div className="sp-header">
-        <div className="sp-title-row">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="28" height="28" className="sp-title-icon-svg" aria-hidden="true">
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" fill="currentColor" opacity=".12"/>
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" fill="currentColor" opacity=".22"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
-            <line x1="16" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="16" y1="19" x2="30" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-          </svg>
-          <h2 className="sp-title">Fundação Exegética e Teológica</h2>
+    <section className={`sp-panel sp-panel-loading${embedded ? " sp-embedded" : ""}`}>
+      {!embedded && (
+        <div className="sp-header">
+          <div className="sp-title-row">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="28" height="28" className="sp-title-icon-svg" aria-hidden="true">
+              <rect x="6" y="4" width="30" height="40" rx="3" ry="3" fill="currentColor" opacity=".12"/>
+              <rect x="6" y="4" width="30" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
+              <rect x="6" y="4" width="7" height="40" rx="3" ry="3" fill="currentColor" opacity=".22"/>
+              <rect x="6" y="4" width="7" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.4" fill="none"/>
+              <line x1="16" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="19" x2="30" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+            </svg>
+            <h2 className="sp-title">Fundação Exegética e Teológica</h2>
+          </div>
+          <p className="sp-subtitle">Consultando especialistas em paralelo…</p>
         </div>
-        <p className="sp-subtitle">Consultando especialistas em paralelo…</p>
-      </div>
+      )}
+      {embedded && (
+        <p className="sp-embedded-loading-msg">Consultando especialistas em paralelo…</p>
+      )}
       <div className="sp-loading-grid">
         {labels.map((l) => (
           <div key={l.label} className="sp-loading-card">
@@ -393,6 +400,11 @@ const TODOS_TIPOS = [
   { label: "Esboço", icon: "📝" },
   { label: "Estudo Bíblico", icon: "📖" },
 ];
+const ABAS_TODOS = [
+  ...TODOS_TIPOS,
+  { label: "Fundação", icon: "🔍" },
+];
+const FUNDACAO_INDEX = TODOS_TIPOS.length;
 
 interface AllTypesResultProps {
   resultados: GeneratedContent[];
@@ -407,6 +419,15 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: A
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
+    if (activeTab === FUNDACAO_INDEX) {
+      if (!apoio?.length) return;
+      const text = apoio.map((r) => `## ${r.label}\n\n${r.content}`).join("\n\n---\n\n");
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      });
+      return;
+    }
     const content = resultados[activeTab]?.content;
     if (!content) return;
     navigator.clipboard.writeText(content).then(() => {
@@ -441,12 +462,14 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: A
           </div>
         </div>
 
-        <div className="at-tabs">
-          {TODOS_TIPOS.map((tipo, i) => (
+        <div className="at-tabs" role="tablist" aria-label="Tipos gerados e fundação">
+          {ABAS_TODOS.map((tipo, i) => (
             <button
-              key={i}
+              key={tipo.label}
               type="button"
-              className={`at-tab${activeTab === i ? " is-active" : ""}`}
+              role="tab"
+              aria-selected={activeTab === i}
+              className={`at-tab${activeTab === i ? " is-active" : ""}${i === FUNDACAO_INDEX ? " at-tab-fundacao" : ""}`}
               onClick={() => setActiveTab(i)}
             >
               <span className="at-tab-icon">{tipo.icon}</span>
@@ -456,16 +479,20 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: A
         </div>
 
         <div className="at-body">
-          {resultados[activeTab] && (
+          {activeTab === FUNDACAO_INDEX ? (
+            apoio && apoio.length > 0 ? (
+              <SpecialistPanel results={apoio} embedded onBibleRef={onBibleRef} />
+            ) : (
+              <p className="sgf-fundacao-empty">A fundação exegética ainda está sendo preparada.</p>
+            )
+          ) : resultados[activeTab] ? (
             <div className="at-content">
               {renderSermonContent(resultados[activeTab].content, onBibleRef)}
               <SermonFooter info={{ ...footerInfo, tipo: TODOS_TIPOS[activeTab].label }} />
             </div>
-          )}
+          ) : null}
         </div>
       </section>
-
-      {apoio && apoio.length > 0 && <SpecialistPanel results={apoio} onBibleRef={onBibleRef} />}
     </div>
   );
 }
@@ -507,9 +534,9 @@ export function SermonGeneratorForm() {
   const [pesquisaTodos, setPesquisaTodos] = useState<SupportResult[] | null>(null);
   const [footerInfoTodos, setFooterInfoTodos] = useState<FooterInfo | null>(null);
   const [bibleRef, setBibleRef] = useState<string | null>(null);
+  const [outputTab, setOutputTab] = useState<"conteudo" | "fundacao">("conteudo");
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
-  const specialistRef = useRef<HTMLDivElement>(null);
   const todosRef = useRef<HTMLDivElement>(null);
 
   const textoBasePreview = useMemo(
@@ -552,6 +579,7 @@ export function SermonGeneratorForm() {
     setResultadosTodos(null);
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
+    setOutputTab("conteudo");
 
     if (!textoBasePreview && !tema.trim()) {
       setErro("Informe pelo menos um tema ou uma passagem bíblica.");
@@ -607,6 +635,7 @@ export function SermonGeneratorForm() {
     setResultadosTodos(null);
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
+    setOutputTab("conteudo");
 
     if (!textoBasePreview && !tema.trim()) {
       setErro("Informe pelo menos um tema ou uma passagem bíblica.");
@@ -657,17 +686,10 @@ export function SermonGeneratorForm() {
       // 2. Executa os agentes de apoio em paralelo (sem streaming)
       if (apoio.length > 0) {
         setLoadingEspecialistas(true);
-        setTimeout(() => {
-          specialistRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
 
         const suportes = await runSupportAgents(apoio, request);
         setPesquisaEspecializada(suportes);
         setLoadingEspecialistas(false);
-
-        setTimeout(() => {
-          specialistRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
       }
     } catch (err) {
       setErro(
@@ -683,6 +705,16 @@ export function SermonGeneratorForm() {
   }
 
   function handleCopy() {
+    if (outputTab === "fundacao" && pesquisaEspecializada?.length) {
+      const text = pesquisaEspecializada
+        .map((r) => `## ${r.label}\n\n${r.content}`)
+        .join("\n\n---\n\n");
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      });
+      return;
+    }
     if (!saida) return;
     navigator.clipboard.writeText(saida).then(() => {
       setCopied(true);
@@ -700,6 +732,7 @@ export function SermonGeneratorForm() {
     setResultadosTodos(null);
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
+    setOutputTab("conteudo");
     setUsarPassagem(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1023,11 +1056,9 @@ export function SermonGeneratorForm() {
             <label className="sgf-check sgf-check--mordomia">
               <input type="checkbox" checked={incluirMordomia} onChange={(e) => setIncluirMordomia(e.target.checked)} />
               <span className="sgf-check-box" />
-              <span>🤲 Perspectiva sobre dízimos, ofertas e generosidade</span>
+              <span>🤲 Dizimar, ofertar e primiciar (toda a Bíblia)</span>
             </label>
-            {incluirMordomia && (
-              <span className="sgf-mordomia-hint">Ativa o agente especializado em mordomia cristã — enriquece com passagens sobre dar, generosidade e sustento do ministério.</span>
-            )}
+            <span className="sgf-mordomia-hint">Lê a Bíblia inteira: dizimar, ofertar e primiciar como atos (não só Malaquias nem só versículos com a palavra “dízimo”). Liga sozinho se o tema ou a passagem já falarem disso.</span>
           </div>
         </section>
 
@@ -1097,23 +1128,51 @@ export function SermonGeneratorForm() {
               </button>
             </div>
           </div>
-          <div className="sgf-output-body">
-            {renderSermonContent(saida, setBibleRef)}
-            {loading && <span className="sgf-cursor" aria-hidden="true" />}
-            {footerInfo && !loading && <SermonFooter info={footerInfo} />}
+
+          {(apoioLabels.length > 0 || pesquisaEspecializada) && (
+            <div className="at-tabs" role="tablist" aria-label="Conteúdo e fundação">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={outputTab === "conteudo"}
+                className={`at-tab${outputTab === "conteudo" ? " is-active" : ""}`}
+                onClick={() => setOutputTab("conteudo")}
+              >
+                <span className="at-tab-label">{tipoLabel}</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={outputTab === "fundacao"}
+                className={`at-tab${outputTab === "fundacao" ? " is-active" : ""}`}
+                onClick={() => setOutputTab("fundacao")}
+              >
+                <span className="at-tab-icon">🔍</span>
+                <span className="at-tab-label">Fundação</span>
+                {loadingEspecialistas && <span className="sgf-tab-dot" aria-hidden="true" />}
+              </button>
+            </div>
+          )}
+
+          <div className={`sgf-output-body${outputTab === "fundacao" ? " is-fundacao" : ""}`}>
+            {outputTab === "fundacao" ? (
+              loadingEspecialistas && apoioLabels.length > 0 ? (
+                <SpecialistLoadingPanel labels={apoioLabels} embedded />
+              ) : pesquisaEspecializada && pesquisaEspecializada.length > 0 ? (
+                <SpecialistPanel results={pesquisaEspecializada} embedded onBibleRef={setBibleRef} />
+              ) : (
+                <p className="sgf-fundacao-empty">A fundação exegética ainda está sendo preparada.</p>
+              )
+            ) : (
+              <>
+                {renderSermonContent(saida, setBibleRef)}
+                {loading && <span className="sgf-cursor" aria-hidden="true" />}
+                {footerInfo && !loading && <SermonFooter info={footerInfo} />}
+              </>
+            )}
           </div>
         </section>
       )}
-
-      {/* ── Pesquisa Especializada ── */}
-      <div ref={specialistRef}>
-        {loadingEspecialistas && apoioLabels.length > 0 && (
-          <SpecialistLoadingPanel labels={apoioLabels} />
-        )}
-        {pesquisaEspecializada && pesquisaEspecializada.length > 0 && !loadingEspecialistas && (
-          <SpecialistPanel results={pesquisaEspecializada} onBibleRef={setBibleRef} />
-        )}
-      </div>
 
       {/* ── Resultado: Gerar os 3 Tipos ── */}
       {loadingTodos && (

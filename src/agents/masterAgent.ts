@@ -1,3 +1,4 @@
+import { isTithesOfferingsRequest } from "@/context/isTithesOfferingsRequest";
 import type { BiblicalAgent, RoutedAgents, SupportAgentConfig, UserRequest } from "@/domain";
 import {
   exegesisResearchPrompt,
@@ -24,7 +25,7 @@ export function masterAgent(request: UserRequest): RoutedAgents {
   let principal: BiblicalAgent;
   let apoio: SupportAgentConfig[];
 
-  const addStewardship = request.incluirMordomia
+  const addStewardship = isTithesOfferingsRequest(request)
     ? [makeSupport(theologyReviewAgent, stewardshipInsightPrompt, "Mordomia e Generosidade", "🤲")]
     : [];
 
@@ -74,7 +75,7 @@ export function masterAgent(request: UserRequest): RoutedAgents {
 
 /** Retorna os 3 agentes principais + agentes de apoio compartilhados para geração simultânea. */
 export function masterAgentAll(request?: UserRequest): { agents: BiblicalAgent[]; apoio: SupportAgentConfig[] } {
-  const addStewardship = request?.incluirMordomia
+  const addStewardship = request && isTithesOfferingsRequest(request)
     ? [makeSupport(theologyReviewAgent, stewardshipInsightPrompt, "Mordomia e Generosidade", "🤲")]
     : [];
 

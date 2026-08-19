@@ -586,6 +586,22 @@ body { margin: 0; min-height: 100vh; }
   line-height: 1.7;
   color: var(--text);
 }
+.sgf-output-body.is-fundacao {
+  padding: 0;
+}
+.sgf-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: blink 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.sgf-fundacao-empty {
+  margin: 0;
+  color: var(--text-3);
+  font-size: .9rem;
+}
 
 .so-h1 {
   font-size: 1.35rem;
@@ -693,6 +709,21 @@ body { margin: 0; min-height: 100vh; }
   background: var(--surface);
   overflow: hidden;
   box-shadow: var(--shadow);
+}
+
+.sp-panel.sp-embedded {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.sp-embedded-loading-msg {
+  margin: 0;
+  padding: 1rem 1.25rem 0;
+  font-size: .85rem;
+  color: var(--text-3);
 }
 
 .sp-panel-loading {
@@ -1144,10 +1175,12 @@ body { margin: 0; min-height: 100vh; }
   display: flex;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  overflow-x: auto;
 }
 
 .at-tab {
   flex: 1;
+  min-width: 5.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1176,7 +1209,11 @@ body { margin: 0; min-height: 100vh; }
 }
 
 .at-tab-icon { font-size: 1.1rem; }
-.at-tab-label { font-size: .9rem; }
+.at-tab-label { font-size: .9rem; white-space: nowrap; }
+
+.at-tab-fundacao {
+  flex: 1.15;
+}
 
 .at-body {
   padding: 0;

@@ -1,4 +1,6 @@
 import type { UserRequest } from "@/domain";
+import { tithesOfferingsContext } from "@/prompts/tithesOfferingsContext";
+import { isTithesOfferingsRequest } from "./isTithesOfferingsRequest";
 
 const TIPO_SERMAO_DESC: Record<string, string> = {
   expositivo: "Expositivo — percorre o texto versículo a versículo ou perícope por perícope, deixando a estrutura do próprio texto determinar os pontos da mensagem",
@@ -62,6 +64,8 @@ INCLUIR CONTEXTO HISTÓRICO E LITERÁRIO: ${request.incluirContextoHistorico ? "
 INCLUIR APLICAÇÃO PRÁTICA: ${request.incluirAplicacao ? "SIM — inclua aplicações concretas, com prazo e contexto real, em cada ponto" : "NÃO — omita seções de aplicação; foque na exposição e na explicação teológica"}
 
 INCLUIR APELO FINAL: ${request.incluirApeloFinal ? "SIM — inclua um apelo ao final: evangelístico, de renovação ou de consagração, conforme o texto" : "NÃO — encerre sem apelo formal"}
+
+INCLUIR PERSPECTIVA DE MORDOMIA / DÍZIMOS E OFERTAS: ${isTithesOfferingsRequest(request) ? "SIM — o tema, a passagem ou o checkbox pedem esta lente. Siga o bloco TEMA ATIVO abaixo no conteúdo principal (não apenas no especialista)." : "NÃO — não force o tema de dízimos se o pedido for outro"}
 ════════════════════════════════════════
-`;
+${isTithesOfferingsRequest(request) ? tithesOfferingsContext : ""}`;
 }

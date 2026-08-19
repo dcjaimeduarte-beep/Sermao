@@ -14,36 +14,37 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 ## Estado atual
 
-**Última atualização:** 2026-04-01
+**Última atualização:** 2026-08-19
 
 **Onde estamos**
 
-- Pacote npm **`app-biblico`** (pasta do repo pode continuar a chamar-se Sermao). **Vite + React + TypeScript**, alias `@/` → `src/`.
-- **Entrada Node:** `src/index.ts` importa `./bootstrap` (mesmo fluxo que o demo). **`npm run dev`** corre essa entrada com **tsx** (equivalente prático a transpilar `src/index.ts` sem build). **`npm run dev:ts-node`** existe para quem quiser `ts-node --esm`, mas com ESM nativo costuma falhar sem extensões `.js` em todo o grafo de imports.
-- **Build produção Node:** `npm run build` usa **`tsconfig.cjs.json`** (`target` ES2020, **`module`: commonjs**, `rootDir`/`outDir` como no teu snippet) + **`tsc-alias`** para resolver `@/` → caminhos relativos + **`scripts/ensure-dist-package.cjs`** que grava `dist/package.json` com `{"type":"commonjs"}` (o `package.json` raiz tem `"type":"module"`; sem isto o Node trataria `dist/*.js` como ESM). **`npm start`** = `node dist/index.js`.
-- **Frontend:** `npm run dev:web` (Vite); artefactos em **`dist-web/`** (para não colidir com `dist/` do Node). **`src/components/SermonGeneratorForm.tsx`** — formulário local: livro (lista PT), capítulo, versículos, tipo de sermão, público, duração, tema opcional, **contexto para a geração**, profundidade e checkboxes; monta `UserRequest` (`textoBase` = `Livro cap:versos`) e chama `runAgent` (stub). **`UserRequest.contextoGeracao`** + linha em `buildUserContext`.
-- **Domínio:** tipos em `src/domain/` — `agent.types.ts` (`AgentSkill`), `biblicalTypes.ts` (`UserRequest`, `BiblicalAgent`, etc.), `skillsCatalog.ts`.
-- **Agentes:** `src/agents/` — agentes individuais, `agentRegistry`, `masterAgent(request)` → `RoutedAgents` (principal por `tipoConteudo`, apoio com revisor); `index.ts` reexporta.
-- **Prompts:** `basePrompt`, `outlinePrompt` (esboço), `sermonPrompt` (sermão), `studyPrompt` (estudo), `theologyPrompt` (revisão teológica) em `src/prompts/`; `index.ts` reexporta.
-- **Contexto para o modelo:** `src/context/buildUserContext.ts` — `buildUserContext(UserRequest)` → texto “DADOS DO PEDIDO”; `index.ts` reexporta.
-- **Execução (stub):** `src/services/aiRouter.ts` — `runAgent(agent, request)` → `Promise<GeneratedContent>`. `src/utils/formatOutput.ts` reexporta `buildUserContext`; `@/utils` também reexporta `runAgent` (desde `aiRouter`).
-- **Demonstração CLI:** `src/bootstrap.ts` (também acionado por `src/index.ts`); `npm run bootstrap` ou `npm run dev` / `npm start` após build.
-- **Convenção:** código na stack que couber; respostas ao utilizador, UI e `sessions/` em **português (pt-BR)** — ver `etapa-05-convencao-idioma.md`.
-- **Histórico detalhado:** `etapa-01` … `etapa-21` nesta pasta; retoma sempre por **`CONTINUIDADE.md` → Estado atual**.
+- App web **React + Vite + TypeScript** (`npm run dev:web` → http://localhost:5173). API: OpenAI `gpt-4o` com streaming. Em produção: `http://sermao.jdafotografia.com.br` (proxy PHP `/proxy/v1`).
+- Pipeline multi-agente: principal (sermão / esboço / estudo) + apoio (Exegeta, Teólogo, Pregador/Esboçista, Mordomia quando o tema pede).
 
-**Próximo passo sugerido (não feito ainda)**
+**Esboço**
+- Solo do tópico (mundo original + sentido da ideia na época).
+- Texto original (heb./gr.) + transliteração + ARA + literal no solo e em cada ponto.
+- Aplicação pessoal sempre (persona + o que o texto pede + passo da semana). O checkbox de aplicação prática controla só as ações do tipo “faça X na terça”.
 
-- Substituir o stub em `runAgent` pela API real (proxy ou env); opcional: segundo passo na UI com agente de apoio (revisor).
+**Dízimos, ofertas, primícias**
+- Não é concórdia de Malaquias 3. O exegeta abstrai de toda a Bíblia a *forma do ato*: dizimar / ofertar / primiciar (incluindo textos onde o ato está e a palavra “dízimo” não está).
+- Liga sozinho se o tema/passagem falar disso (`isTithesOfferingsRequest`) ou se o checkbox de mordomia estiver marcado.
+
+**UI**
+- Fundação Exegética e Teológica é **aba** (não bloco no fim da página): ao lado do sermão/esboço/estudo; nos 3 tipos: Sermão | Esboço | Estudo | Fundação.
+
+**Deploy**
+- `npm run deploy:pack` gera `sermao-deploy.zip`. No servidor, substituir só `index.html` + pasta `assets/` em `public_html/sermao-deploy`. Não commitar `proxy/openai.php` nem o zip.
+
+**Próximo passo sugerido**
+
+- Histórico de gerações (localStorage) e exportar PDF ainda não feitos.
 
 **Comandos úteis**
 
-- `npm run dev` — executa `src/index.ts` com tsx (CLI / demo)  
 - `npm run dev:web` — Vite (interface web)  
-- `npm run build` — `tsc` (CommonJS, `tsconfig.cjs.json`) → `dist/`  
-- `npm start` — `node dist/index.js`  
-- `npm run build:web` — typecheck + build Vite → `dist-web/`  
+- `npm run deploy:pack` — empacota `sermao-deploy.zip`  
 - `npm run typecheck` — verificação TypeScript  
-- `npm run bootstrap` — igual ao fluxo do bootstrap direto (tsx em `src/bootstrap.ts`)  
 
 ---
 
@@ -71,7 +72,9 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-04-01 | Etapa 18 | `services/aiRouter`, `bootstrap.ts`, script `npm run bootstrap` |
 | 2026-04-01 | Etapa 19 | Pacote `app-biblico`, `main`, `src/index.ts`, Vite → `dist-web/` (build Node evolui na 20) |
 | 2026-04-01 | Etapa 20 | `tsconfig.cjs.json` (CommonJS) + `tsc-alias` + `dist/package.json` |
-| 2026-04-01 | Etapa 21 | Formulário web sermão + `contextoGeracao` + `bibleBooks.pt` |
+| 2026-08-19 | Esboço enriquecido | Solo do tópico + original (heb./gr.) com transliteração + aplicação pessoal por ponto |
+| 2026-08-19 | Dízimos e ofertas | Forma canônica dos três atos (dizimar / ofertar / primiciar), não concórdia de Malaquias |
+| 2026-08-19 | Aba Fundação | Fundação exegética/teológica como aba ao lado do conteúdo e dos 3 tipos |
 
 ---
 

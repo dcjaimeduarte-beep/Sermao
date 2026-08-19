@@ -22,11 +22,15 @@ O sermão deve ter fluxo de pregação real — não uma lista de tópicos, mas 
   "outline-agent": `
 Gere agora o ESBOÇO DE PREGAÇÃO — estrutura hierárquica e organizada, ferramenta para o pregador.
 NÃO produza texto corrido de sermão nem estudo com perguntas. Produza:
+- Solo do tópico rico: mundo original, o que o tópico significava então, ponte ao ouvinte
+- Texto original da época (hebraico/grego) + transliteração pronunciável + ARA + literal — no solo e em cada ponto
 - Proposição central em uma frase
 - Pontos numerados (I, II, III) com subtópicos em recuo
-- Cada ponto: exposição resumida + ilustração + aplicação prática
+- Cada ponto: exposição resumida + ilustração + aplicação pessoal (sempre: persona nomeada + o que o texto pede + passo da semana)
+- Seção de aplicações pessoais ao final (sempre: perguntas para casa + dois gestos da semana)
+- Aplicação prática do tipo "faça X na terça" apenas se INCLUIR APLICAÇÃO PRÁTICA for SIM
 - Material de apoio para o pregador ao final
-O esboço deve ser visualmente claro — o pregador precisa enxergar a estrutura de relance.`,
+O esboço deve ser visualmente claro — o pregador precisa enxergar a estrutura de relance, mas com substância suficiente para pregar.`,
 
   "study-agent": `
 Gere agora o ESTUDO BÍBLICO PARA GRUPO — material didático para célula, EBD ou discipulado.
