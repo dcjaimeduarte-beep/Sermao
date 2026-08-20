@@ -32,7 +32,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 **UI**
 - Fundação Exegética e Teológica é **aba**.
 - **Guardados** neste navegador (localStorage).
-- **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o significado.
+- **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o **significado** (dicionário/enciclopédia — não o texto de dízimos).
 
 **Deploy**
 - Pasta pronta: **`sermao-deploy/`** — subir `index.html` + `assets/` + pasta **`bible/`**. Não reenviar `proxy/openai.php`.
@@ -83,6 +83,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-08-20 | Deploy pack | `npm run deploy:pack` gera zip no Linux e no Windows; proxy só entra se `proxy/openai.php` existir |
 | 2026-08-20 | Compilado | Bíblia RA+NVI, Guardados, busca de significado e pasta de deploy completa |
 | 2026-08-20 | Revisão | Inventário: core GitHub intacto; Bíblia/Guardados preservados; formato do sermão alinhado sem apagar a voz |
+| 2026-08-20 | Significado | Busca de palavra devolve definição; tira os artigos de dízimo/oferta do léxico |
 
 ---
 

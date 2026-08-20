@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BIBLE_NAME } from "@/data/bibleCatalog";
-import { cleanLexiconBody, lookupWord, type LexiconEntry } from "@/services/bibleLexicon";
+import { displayMeaning, lookupWord, type LexiconEntry } from "@/services/bibleLexicon";
 import type { BiblePassage } from "@/services/offlineBible";
 
 export function BibleVerseList({
@@ -128,12 +128,12 @@ export function BibleVerseList({
           {loadingMeaning && (
             <div className="bm-state">
               <span className="sgf-spinner bm-spinner" />
-              <span>Consultando o material…</span>
+              <span>Buscando o significado…</span>
             </div>
           )}
           {meaning && !loadingMeaning && meaning.hits.length === 0 && (
             <p className="br-meaning-empty">
-              Não achei “{meaning.query}” no dicionário nem na enciclopédia.
+              Não achei o significado de “{meaning.query}” no dicionário bíblico.
             </p>
           )}
           {meaning &&
@@ -144,7 +144,8 @@ export function BibleVerseList({
                   <span className="br-v-tag">{hit.source}</span>
                   <strong>{hit.title}</strong>
                 </p>
-                <p className="br-meaning-body">{cleanLexiconBody(hit.body)}</p>
+                {hit.origin ? <p className="br-meaning-origin">{hit.origin}</p> : null}
+                <p className="br-meaning-body">{displayMeaning(hit)}</p>
               </article>
             ))}
         </div>

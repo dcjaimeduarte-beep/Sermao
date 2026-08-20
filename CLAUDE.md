@@ -374,5 +374,10 @@ O `aiRouter.ts` chama a API Claude com streaming.
 
 **Único alinhamento de prompt:** bloco no topo de `sermonPrompt.ts` (sem ilustração; verso a verso; 4–6 versículos sem passagem). Voz do pregador, original e traduções do GitHub permanecem. Esboço continua com ilustração.
 
-**Não feito (proposital):** exportar PDF; hebraico/grego no leitor (trocado por RA a pedido).
+### 2026-08-20 — Sessão 15: Significado da palavra (não dízimo)
+
+**O que foi feito:**
+- "Pesquisar significado" lia o documento de dízimos/ofertas e devolvia artigos de mordomia
+- Léxico agora só usa dicionário + enciclopédia; a resposta é a **definição da palavra** (origem + significado)
+- Documento de dízimos continua nos agentes de sermão/estudo, fora desta busca
 
