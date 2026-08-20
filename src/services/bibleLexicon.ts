@@ -43,7 +43,11 @@ export function isTithesLexiconSource(source: string): boolean {
   return /dizim|oferta/i.test(foldText(source));
 }
 
-export function rankLexiconHits(query: string, entries: LexiconEntry[]): LexiconEntry[] {
+export function rankLexiconHits(
+  query: string,
+  entries: LexiconEntry[],
+  opts: { includeTithes?: boolean } = {}
+): LexiconEntry[] {
   const q = foldText(query).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
   if (q.length < 2) return [];
 
@@ -71,7 +75,38 @@ export function rankLexiconHits(query: string, entries: LexiconEntry[]): Lexicon
 
   const hasTitleHit = scored.some((row) => row.score >= 60);
   const kept = hasTitleHit ? scored.filter((row) => row.score >= 60) : scored.filter((row) => row.score >= 40);
-  return kept.slice(0, 5).map((row) => row.entry);
+  const meaningHits = kept.slice(0, 5).map((row) => row.entry);
+  if (!opts.includeTithes) return meaningHits;
+
+  const tithesHits = rankTithesRelatedHits(q, entries);
+  const seen = new Set(meaningHits.map((h) => foldText(h.title)));
+  const extra = tithesHits.filter((h) => !seen.has(foldText(h.title)));
+  return [...meaningHits, ...extra].slice(0, 8);
+}
+
+/** Artigos de mordomia só entram quando a flag de dízimos está ligada no esboço. */
+export function rankTithesRelatedHits(query: string, entries: LexiconEntry[]): LexiconEntry[] {
+  const q = foldText(query).replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  if (q.length < 2) return [];
+  const titheish = /dizim|oferta|primic|maaser|mordomia|generosid|decima/.test(q);
+
+  return entries
+    .filter((entry) => isTithesLexiconSource(entry.source))
+    .map((entry) => {
+      const keys = keysOf(entry);
+      const body = foldText(`${entry.title} ${entry.meaning || ""} ${entry.body || ""}`);
+      const qAlt = q.replace(/aa/g, "a");
+      let score = 0;
+      if (keys.some((k) => k === q || (k.split(/\s+/).find(Boolean) ?? "") === q)) score = 100;
+      else if (q.length >= 3 && keys.some((k) => k.startsWith(q) || k.includes(q))) score = 70;
+      else if (q.length >= 5 && (asWord(body, q) || (qAlt !== q && asWord(body, qAlt)))) score = 40;
+      else if (titheish && body.includes(q)) score = 25;
+      return { entry, score };
+    })
+    .filter((row) => row.score >= (titheish ? 25 : 40))
+    .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title, "pt"))
+    .slice(0, 5)
+    .map((row) => row.entry);
 }
 
 export function displayMeaning(entry: LexiconEntry): string {
@@ -96,11 +131,14 @@ export async function loadLexicon(): Promise<LexiconEntry[]> {
   return cache;
 }
 
-export async function lookupWord(raw: string): Promise<{ query: string; hits: LexiconEntry[] }> {
+export async function lookupWord(
+  raw: string,
+  opts: { includeTithes?: boolean } = {}
+): Promise<{ query: string; hits: LexiconEntry[] }> {
   const folded = foldText(raw).replace(/[^\p{L}\p{N}\s]/gu, " ");
   const words = folded.split(/\s+/).filter((w) => w.length >= 2 && !STOP.has(w));
   const query = (words.sort((a, b) => b.length - a.length)[0] ?? folded.trim()).trim();
   if (!query) return { query: raw.trim(), hits: [] };
   const entries = await loadLexicon();
-  return { query, hits: rankLexiconHits(query, entries) };
+  return { query, hits: rankLexiconHits(query, entries, opts) };
 }

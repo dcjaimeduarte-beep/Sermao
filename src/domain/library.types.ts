@@ -19,4 +19,5 @@ export interface SavedLibraryItem {
   allContents?: Array<{ label: string; content: string }>;
   footer: FooterInfo;
   support?: Array<{ label: string; icone?: string; content: string }>;
+  incluirMordomia?: boolean;
 }

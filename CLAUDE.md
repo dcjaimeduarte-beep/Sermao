@@ -381,3 +381,10 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Léxico agora só usa dicionário + enciclopédia; a resposta é a **definição da palavra** (origem + significado)
 - Documento de dízimos continua nos agentes de sermão/estudo, fora desta busca
 
+### 2026-08-20 — Sessão 16: Significado no esboço + dízimos sob flag
+
+**O que foi feito:**
+- “Pesquisar significado” também no texto do **esboço** (geração simples, aba Esboço nos 3 tipos e Guardados)
+- Com a flag de mordomia/dízimos: além da definição, traz os artigos relacionados de `dizimos-ofertas-referencia.md`
+- Sem a flag: continua só o significado da palavra
+

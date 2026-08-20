@@ -1,7 +1,7 @@
 /**
  * Gera public/bible/lexicon.json para "Pesquisar significado".
- * Só dicionário e enciclopédia — o texto de dízimos/ofertas fica para os agentes,
- * não entra como verbete de palavra.
+ * Dicionário e enciclopédia sempre. Dízimos/ofertas só entram na busca
+ * quando o esboço tem a flag de mordomia ligada.
  */
 const fs = require("fs");
 const path = require("path");
@@ -274,6 +274,26 @@ const CORE_WORDS = [
   },
 ];
 
+function parseTithes(md) {
+  const entries = [];
+  const parts = md.split(/^### /m);
+  for (const part of parts.slice(1)) {
+    const nl = part.indexOf("\n");
+    const title = (nl < 0 ? part : part.slice(0, nl)).trim();
+    let body = (nl < 0 ? "" : part.slice(nl + 1)).trim();
+    body = body.replace(/\n---\s*\n##[\s\S]*$/, "").trim();
+    pushEntry(entries, {
+      title,
+      source: "Dízimos e ofertas",
+      meaning: firstProse(body),
+      origin: extractLabeled(body, ["Hebraico-chave", "Hebraico", "Grego"]),
+      aliases: titleAliases(title),
+      body,
+    });
+  }
+  return entries;
+}
+
 const dicPath = path.join(ROOT, "docs", "dicionario-biblico.md");
 const encPath = path.join(ROOT, "docs", "enciclopedia-biblica.md");
 const entries = [];
@@ -288,6 +308,10 @@ if (fs.existsSync(encPath)) {
   entries.push(...parseBoldPeople(enc));
   entries.push(...parseInlineGlossary(enc));
   entries.push(...parseMeaningTables(enc));
+}
+const tithesPath = path.join(ROOT, "docs", "dizimos-ofertas-referencia.md");
+if (fs.existsSync(tithesPath)) {
+  entries.push(...parseTithes(fs.readFileSync(tithesPath, "utf8")));
 }
 
 const seen = new Set();

@@ -6,9 +6,11 @@ import { runAgent, runAllMainAgents, runSupportAgents } from "@/services/aiRoute
 import { BIBLE_BOOKS_PT } from "@/data/bibleBooks.pt";
 import { BIBLE_NAME } from "@/data/bibleCatalog";
 import { loadLibrary, saveLibraryItem } from "@/services/contentLibrary";
+import { isTithesOfferingsRequest } from "@/context/isTithesOfferingsRequest";
 import { BiblePassageModal } from "./BiblePassageModal";
 import { BibleReader } from "./BibleReader";
 import { SavedLibraryPanel } from "./SavedLibraryPanel";
+import { WordMeaningLookup } from "./WordMeaningLookup";
 
 const CONTENT_TYPE_OPTIONS: { value: ContentType; label: string; desc: string }[] = [
   { value: "sermao", label: "Sermão", desc: "Pregação completa com introdução, desenvolvimento e conclusão" },
@@ -336,9 +338,16 @@ interface AllTypesResultProps {
   onBibleRef?: (ref: string) => void;
   onSave: () => void;
   savedFlash?: boolean;
+  includeTithes?: boolean;
 }
 
-function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onSave, savedFlash }: AllTypesResultProps) {
+function outlineLookupHint(includeTithes: boolean): string {
+  return includeTithes
+    ? "Selecione uma palavra no esboço para ver o significado e a relação com dízimos e ofertas."
+    : "Selecione uma palavra no esboço para ver o significado.";
+}
+
+function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onSave, savedFlash, includeTithes }: AllTypesResultProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -413,10 +422,16 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onS
               <p className="sgf-fundacao-empty">A fundação exegética ainda está sendo preparada.</p>
             )
           ) : resultados[activeTab] ? (
-            <div className="at-content">
-              {renderSermonContent(resultados[activeTab].content, onBibleRef)}
-              <SermonFooter info={{ ...footerInfo, tipo: TODOS_TIPOS[activeTab].label }} />
-            </div>
+            <WordMeaningLookup
+              enabled={activeTab === 1}
+              includeTithes={!!includeTithes}
+              hint={activeTab === 1 ? outlineLookupHint(!!includeTithes) : undefined}
+            >
+              <div className="at-content">
+                {renderSermonContent(resultados[activeTab].content, onBibleRef)}
+                <SermonFooter info={{ ...footerInfo, tipo: TODOS_TIPOS[activeTab].label }} />
+              </div>
+            </WordMeaningLookup>
           ) : null}
         </div>
       </section>
@@ -466,6 +481,8 @@ export function SermonGeneratorForm() {
   const [library, setLibrary] = useState<SavedLibraryItem[]>(() => loadLibrary());
   const [savedFlash, setSavedFlash] = useState(false);
   const [outputTab, setOutputTab] = useState<"conteudo" | "fundacao">("conteudo");
+  const [lookupTithes, setLookupTithes] = useState(false);
+  const [saidaKind, setSaidaKind] = useState<ContentType | "tres" | null>(null);
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const todosRef = useRef<HTMLDivElement>(null);
@@ -521,6 +538,8 @@ export function SermonGeneratorForm() {
 
     try {
       const request = montarPedido();
+      setLookupTithes(isTithesOfferingsRequest(request));
+      setSaidaKind("tres");
       const { agents, apoio } = masterAgentAll(request);
 
       const [todos, suportes] = await Promise.all([
@@ -582,6 +601,8 @@ export function SermonGeneratorForm() {
 
     try {
       const request = montarPedido();
+      setLookupTithes(isTithesOfferingsRequest(request));
+      setSaidaKind(request.tipoConteudo);
       const { principal, apoio } = masterAgent(request);
 
       // Guarda os labels dos agentes de apoio para mostrar no loading
@@ -669,6 +690,7 @@ export function SermonGeneratorForm() {
         title: footerInfo.passagem || tema.trim() || tipoLabel,
         content: saida,
         footer: footerInfo,
+        incluirMordomia: lookupTithes,
         support: pesquisaEspecializada?.map((r) => ({
           label: r.label,
           icone: r.icone,
@@ -694,6 +716,7 @@ export function SermonGeneratorForm() {
           content: r.content,
         })),
         footer: footerInfoTodos,
+        incluirMordomia: lookupTithes,
         support: pesquisaTodos?.map((r) => ({
           label: r.label,
           icone: r.icone,
@@ -716,6 +739,8 @@ export function SermonGeneratorForm() {
     setFooterInfoTodos(null);
     setOutputTab("conteudo");
     setUsarPassagem(false);
+    setLookupTithes(false);
+    setSaidaKind(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -748,7 +773,10 @@ export function SermonGeneratorForm() {
             items={library}
             onChange={setLibrary}
             onOpen={(item) => {
+              const savedTithes = !!item.incluirMordomia;
+              setLookupTithes(savedTithes);
               if (item.kind === "tres" && item.allContents) {
+                setSaidaKind("tres");
                 setResultadosTodos(
                   item.allContents.map((row, i) => ({
                     agentId: `saved-${i}`,
@@ -768,6 +796,8 @@ export function SermonGeneratorForm() {
                 setFooterInfoTodos(item.footer);
                 setSaida(null);
               } else {
+                const label = (item.tipoLabel || "").toLowerCase();
+                setSaidaKind(label.includes("esbo") ? "esboco" : label.includes("estudo") ? "estudo" : "sermao");
                 setSaida(item.content);
                 setFooterInfo(item.footer);
                 setPesquisaEspecializada(
@@ -1193,11 +1223,15 @@ export function SermonGeneratorForm() {
                 <p className="sgf-fundacao-empty">A fundação exegética ainda está sendo preparada.</p>
               )
             ) : (
-              <>
+              <WordMeaningLookup
+                enabled={saidaKind === "esboco"}
+                includeTithes={lookupTithes}
+                hint={outlineLookupHint(lookupTithes)}
+              >
                 {renderSermonContent(saida, setBibleRef)}
                 {loading && <span className="sgf-cursor" aria-hidden="true" />}
                 {footerInfo && !loading && <SermonFooter info={footerInfo} />}
-              </>
+              </WordMeaningLookup>
             )}
           </div>
         </section>
@@ -1228,6 +1262,7 @@ export function SermonGeneratorForm() {
             onBibleRef={setBibleRef}
             onSave={handleSalvarTodos}
             savedFlash={savedFlash}
+            includeTithes={lookupTithes}
           />
         </div>
       )}

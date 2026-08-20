@@ -32,7 +32,8 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 **UI**
 - Fundação Exegética e Teológica é **aba**.
 - **Guardados** neste navegador (localStorage).
-- **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o **significado** (dicionário/enciclopédia — não o texto de dízimos).
+- **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o **significado** (dicionário/enciclopédia).
+- **Esboço:** a mesma busca no texto gerado. Se a flag de dízimos/mordomia estiver ligada, também traz os verbetes de dízimos e ofertas relacionados.
 
 **Deploy**
 - Pasta pronta: **`sermao-deploy/`** — subir `index.html` + `assets/` + pasta **`bible/`**. Não reenviar `proxy/openai.php`.
@@ -84,6 +85,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-08-20 | Compilado | Bíblia RA+NVI, Guardados, busca de significado e pasta de deploy completa |
 | 2026-08-20 | Revisão | Inventário: core GitHub intacto; Bíblia/Guardados preservados; formato do sermão alinhado sem apagar a voz |
 | 2026-08-20 | Significado | Busca de palavra devolve definição; tira os artigos de dízimo/oferta do léxico |
+| 2026-08-20 | Esboço | Mesma busca no esboço; dízimos só se a flag de mordomia estiver ligada |
 
 ---
 
