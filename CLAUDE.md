@@ -350,3 +350,34 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Adicionar modo de impressão / exportar para PDF
 - Adicionar histórico de sermões gerados (localStorage)
 
+---
+
+### 2026-08-20 — Sessão 11–13: Bíblia do Pb Jaime + Guardados + pasta de deploy
+
+**O que foi feito (reconstruído no GitHub a partir da sessão do PC):**
+- Bíblia offline **RA + NVI** (`public/bible/`), leitor compacto, referências clicáveis, busca de significado no dicionário/enciclopédia do projeto
+- **Guardados** em localStorage (`sermao-library-v1`) para sermão, esboço e estudo
+- Pasta **`sermao-deploy/`** no repositório (index + assets + bible) para upload sem depender do zip da VM
+
+---
+
+### 2026-08-20 — Sessão 14: Revisão de inventário (não perder, não trocar)
+
+**GitHub core mantido (idêntico a `00ef24e`):**
+- Agentes: `sermonAgent`, `outlineAgent`, `studyAgent`, `theologyReviewAgent`, `masterAgent` / `masterAgentAll`
+- Prompts: esboço, estudo, teologia, apoio, base, dízimos/mordomia
+- Proxy de produção `/proxy/v1` + `gpt-4o`
+- UI: tipo de conteúdo, passagem opcional, segunda passagem, público, duração, profundidade, checkboxes (histórico, aplicação, apelo, mordomia), Gerar os 3 Tipos, aba Fundação, referências clicáveis
+
+**Acrescentado (não substitui o core):**
+- Bíblia do Pb Jaime, Guardados, scripts de split/léxico/deploy, pasta `sermao-deploy/`
+
+**Único alinhamento de prompt:** bloco no topo de `sermonPrompt.ts` (sem ilustração; verso a verso; 4–6 versículos sem passagem). Voz do pregador, original e traduções do GitHub permanecem. Esboço continua com ilustração.
+
+### 2026-08-20 — Sessão 15: Significado da palavra (não dízimo)
+
+**O que foi feito:**
+- "Pesquisar significado" lia o documento de dízimos/ofertas e devolvia artigos de mordomia
+- Léxico agora só usa dicionário + enciclopédia; a resposta é a **definição da palavra** (origem + significado)
+- Documento de dízimos continua nos agentes de sermão/estudo, fora desta busca
+
