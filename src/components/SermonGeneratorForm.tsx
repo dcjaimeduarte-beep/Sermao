@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { AudienceType, ContentType, GeneratedContent, SermonStyle, UserRequest } from "@/domain";
+import type { FooterInfo, SavedLibraryItem } from "@/domain/library.types";
 import { masterAgent, masterAgentAll } from "@/agents/masterAgent";
 import { runAgent, runAllMainAgents, runSupportAgents } from "@/services/aiRouter";
 import { BIBLE_BOOKS_PT } from "@/data/bibleBooks.pt";
+import { BIBLE_NAME } from "@/data/bibleCatalog";
+import { loadLibrary, saveLibraryItem } from "@/services/contentLibrary";
+import { BiblePassageModal } from "./BiblePassageModal";
+import { BibleReader } from "./BibleReader";
+import { SavedLibraryPanel } from "./SavedLibraryPanel";
 
 const CONTENT_TYPE_OPTIONS: { value: ContentType; label: string; desc: string }[] = [
   { value: "sermao", label: "Sermão", desc: "Pregação completa com introdução, desenvolvimento e conclusão" },
@@ -79,7 +85,7 @@ function renderInline(text: string, onBibleRef?: (ref: string) => void): React.R
   // 1. Split by bold/italic markers
   const boldItalicParts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/);
 
-  return boldItalicParts.flatMap((part, bi) => {
+  return boldItalicParts.flatMap((part, bi): React.ReactNode[] => {
     if (!part) return [];
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4)
       return [<strong key={`b${bi}`}>{part.slice(2, -2)}</strong>];
@@ -164,90 +170,6 @@ function renderSermonContent(text: string, onBibleRef?: (ref: string) => void): 
   }
   flushList();
   return <>{nodes}</>;
-}
-
-// ── Modal de passagem bíblica ───────────────────────────────────────────────
-function BiblePassageModal({ refText, onClose }: { refText: string; onClose: () => void }) {
-  const [passageText, setPassageText] = useState<string | null>(null);
-  const [reference, setReference] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    setPassageText(null);
-    setReference(null);
-
-    const encoded = encodeURIComponent(refText);
-    fetch(`https://bible-api.com/${encoded}?translation=almeida`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setPassageText(data.text?.trim() ?? "");
-        setReference(data.reference ?? refText);
-      })
-      .catch(() =>
-        setError("Não foi possível carregar a passagem. Verifique a conexão e tente novamente.")
-      )
-      .finally(() => setLoading(false));
-  }, [refText]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
-
-  return (
-    <div className="bm-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bm-modal" role="dialog" aria-modal="true" aria-label={refText}>
-        <div className="bm-header">
-          <div className="bm-title-row">
-            <span className="bm-ref-badge">📖</span>
-            <h2 className="bm-title">{reference ?? refText}</h2>
-          </div>
-          <button type="button" className="bm-close" onClick={onClose} aria-label="Fechar">✕</button>
-        </div>
-
-        <div className="bm-body">
-          {loading && (
-            <div className="bm-state">
-              <span className="sgf-spinner bm-spinner" />
-              <span>Carregando passagem…</span>
-            </div>
-          )}
-          {error && (
-            <div className="bm-state bm-error">
-              <span>⚠</span> {error}
-            </div>
-          )}
-          {passageText && !loading && (
-            <p className="bm-passage">{passageText}</p>
-          )}
-        </div>
-
-        <div className="bm-footer">
-          <span className="bm-source">Bíblia Almeida · bible-api.com</span>
-          <button type="button" className="bm-close-btn" onClick={onClose}>Fechar</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface FooterInfo {
-  passagem: string;
-  tipo: string;
-  publico: AudienceType;
-  duracao: number;
-  profundidade: string;
-  pastor: string;
-  igreja: string;
-  data: string;
 }
 
 function SermonFooter({ info }: { info: FooterInfo }) {
@@ -412,9 +334,11 @@ interface AllTypesResultProps {
   footerInfo: FooterInfo;
   onNovo: () => void;
   onBibleRef?: (ref: string) => void;
+  onSave: () => void;
+  savedFlash?: boolean;
 }
 
-function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: AllTypesResultProps) {
+function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onSave, savedFlash }: AllTypesResultProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -451,6 +375,9 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef }: A
               onClick={handleCopy}
             >
               {copied ? "✓ Copiado" : "Copiar"}
+            </button>
+            <button type="button" className="sgf-action-btn" onClick={onSave}>
+              {savedFlash ? "✓ Guardado" : "Salvar"}
             </button>
             <button
               type="button"
@@ -534,6 +461,10 @@ export function SermonGeneratorForm() {
   const [pesquisaTodos, setPesquisaTodos] = useState<SupportResult[] | null>(null);
   const [footerInfoTodos, setFooterInfoTodos] = useState<FooterInfo | null>(null);
   const [bibleRef, setBibleRef] = useState<string | null>(null);
+  const [bibleOpen, setBibleOpen] = useState(false);
+  const [readerLoc, setReaderLoc] = useState({ bookId: "joao", chapter: 1 });
+  const [library, setLibrary] = useState<SavedLibraryItem[]>(() => loadLibrary());
+  const [savedFlash, setSavedFlash] = useState(false);
   const [outputTab, setOutputTab] = useState<"conteudo" | "fundacao">("conteudo");
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
@@ -722,6 +653,57 @@ export function SermonGeneratorForm() {
     });
   }
 
+  function flashSaved() {
+    setSavedFlash(true);
+    window.setTimeout(() => setSavedFlash(false), 2000);
+  }
+
+  function handleSalvarUnico() {
+    if (!saida || !footerInfo) return;
+    setLibrary(
+      saveLibraryItem({
+        id: `${Date.now()}`,
+        savedAt: Date.now(),
+        kind: "unico",
+        tipoLabel,
+        title: footerInfo.passagem || tema.trim() || tipoLabel,
+        content: saida,
+        footer: footerInfo,
+        support: pesquisaEspecializada?.map((r) => ({
+          label: r.label,
+          icone: r.icone,
+          content: r.content,
+        })),
+      })
+    );
+    flashSaved();
+  }
+
+  function handleSalvarTodos() {
+    if (!resultadosTodos || !footerInfoTodos) return;
+    setLibrary(
+      saveLibraryItem({
+        id: `${Date.now()}`,
+        savedAt: Date.now(),
+        kind: "tres",
+        tipoLabel: "3 tipos",
+        title: footerInfoTodos.passagem || tema.trim() || "3 tipos",
+        content: resultadosTodos.map((r) => r.content).join("\n\n"),
+        allContents: resultadosTodos.map((r, i) => ({
+          label: TODOS_TIPOS[i]?.label ?? r.agentName,
+          content: r.content,
+        })),
+        footer: footerInfoTodos,
+        support: pesquisaTodos?.map((r) => ({
+          label: r.label,
+          icone: r.icone,
+          content: r.content,
+        })),
+      })
+    );
+    flashSaved();
+  }
+
   function handleNovo() {
     setSaida(null);
     setFooterInfo(null);
@@ -760,6 +742,50 @@ export function SermonGeneratorForm() {
           <p className="sgf-subtitle">
             Sermões, esboços e estudos com exegese do original, textos paralelos e aplicação pastoral em linguagem atual.
           </p>
+        </div>
+        <div className="sgf-header-actions">
+          <SavedLibraryPanel
+            items={library}
+            onChange={setLibrary}
+            onOpen={(item) => {
+              if (item.kind === "tres" && item.allContents) {
+                setResultadosTodos(
+                  item.allContents.map((row, i) => ({
+                    agentId: `saved-${i}`,
+                    agentName: row.label,
+                    content: row.content,
+                  }))
+                );
+                setPesquisaTodos(
+                  (item.support ?? []).map((s) => ({
+                    agentId: s.label,
+                    agentName: s.label,
+                    label: s.label,
+                    icone: s.icone ?? "🔍",
+                    content: s.content,
+                  }))
+                );
+                setFooterInfoTodos(item.footer);
+                setSaida(null);
+              } else {
+                setSaida(item.content);
+                setFooterInfo(item.footer);
+                setPesquisaEspecializada(
+                  (item.support ?? []).map((s) => ({
+                    agentId: s.label,
+                    agentName: s.label,
+                    label: s.label,
+                    icone: s.icone ?? "🔍",
+                    content: s.content,
+                  }))
+                );
+                setResultadosTodos(null);
+              }
+            }}
+          />
+          <button type="button" className="sgf-bible-open" onClick={() => setBibleOpen(true)}>
+            {BIBLE_NAME}
+          </button>
         </div>
       </header>
 
@@ -1118,6 +1144,9 @@ export function SermonGeneratorForm() {
               >
                 {copied ? "✓ Copiado" : "Copiar"}
               </button>
+              <button type="button" className="sgf-action-btn" onClick={handleSalvarUnico} disabled={loading}>
+                {savedFlash ? "✓ Guardado" : "Salvar"}
+              </button>
               <button
                 type="button"
                 className="sgf-action-btn sgf-action-btn-secondary"
@@ -1197,13 +1226,30 @@ export function SermonGeneratorForm() {
             footerInfo={footerInfoTodos}
             onNovo={handleNovo}
             onBibleRef={setBibleRef}
+            onSave={handleSalvarTodos}
+            savedFlash={savedFlash}
           />
         </div>
       )}
 
       {/* ── Modal de passagem bíblica ── */}
       {bibleRef && (
-        <BiblePassageModal refText={bibleRef} onClose={() => setBibleRef(null)} />
+        <BiblePassageModal
+          refText={bibleRef}
+          onClose={() => setBibleRef(null)}
+          onOpenReader={(bookId, chapter) => {
+            setBibleRef(null);
+            setReaderLoc({ bookId, chapter });
+            setBibleOpen(true);
+          }}
+        />
+      )}
+      {bibleOpen && (
+        <BibleReader
+          initialBookId={readerLoc.bookId}
+          initialChapter={readerLoc.chapter}
+          onClose={() => setBibleOpen(false)}
+        />
       )}
     </div>
   );

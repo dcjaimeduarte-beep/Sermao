@@ -13,11 +13,11 @@ const AGENT_TIPO_CONTEUDO: Record<string, ContentType> = {
 const AGENT_USER_INSTRUCTION: Record<string, string> = {
   "sermon-agent": `
 Gere agora o SERMÃO COMPLETO E PREGÁVEL — pronto para o púlpito.
-NÃO produza esboço nem estudo bíblico. Produza texto corrido pastoral com:
-- Introdução narrativa e impactante
-- Desenvolvimento em pontos expositivos com exposição, explicação, ilustração e aplicação integrada em cada ponto
-- Conclusão com síntese emocional e chamada
-O sermão deve ter fluxo de pregação real — não uma lista de tópicos, mas uma mensagem com coração pastoral.`,
+NÃO produza esboço nem estudo bíblico.
+Sem ilustrações. Parágrafos curtos (no máximo 4 frases).
+Se houver passagem com capítulo e versículos: percorra VERSÍCULO A VERSÍCULO (Texto + Exegese + Aplicação em cada movimento).
+Se não houver passagem: escolha 4 a 6 versículos principais do tema e use o mesmo formato.
+Abertura e fecho curtos. Original só quando iluminar, em uma linha.`,
 
   "outline-agent": `
 Gere agora o ESBOÇO DE PREGAÇÃO — estrutura hierárquica e organizada, ferramenta para o pregador.

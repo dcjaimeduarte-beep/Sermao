@@ -26,19 +26,24 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Texto original (heb./gr.) + transliteração + ARA + literal no solo e em cada ponto.
 - Aplicação pessoal sempre (persona + o que o texto pede + passo da semana). O checkbox de aplicação prática controla só as ações do tipo “faça X na terça”.
 
+**Sermão**
+- Sem ilustração. Com passagem: versículo a versículo. Sem passagem: 4 a 6 versículos principais.
+
+**UI**
+- Fundação Exegética e Teológica é **aba**.
+- **Guardados** neste navegador (localStorage).
+- **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o significado.
+
+**Deploy**
+- Pasta pronta: **`sermao-deploy/`** — subir `index.html` + `assets/` + pasta **`bible/`**. Não reenviar `proxy/openai.php`.
+
 **Dízimos, ofertas, primícias**
 - Não é concórdia de Malaquias 3. O exegeta abstrai de toda a Bíblia a *forma do ato*: dizimar / ofertar / primiciar (incluindo textos onde o ato está e a palavra “dízimo” não está).
 - Liga sozinho se o tema/passagem falar disso (`isTithesOfferingsRequest`) ou se o checkbox de mordomia estiver marcado.
 
-**UI**
-- Fundação Exegética e Teológica é **aba** (não bloco no fim da página): ao lado do sermão/esboço/estudo; nos 3 tipos: Sermão | Esboço | Estudo | Fundação.
-
-**Deploy**
-- Pasta pronta no projeto: **`sermao-deploy/`** (`index.html` + `assets/` + o zip). No servidor (`public_html/sermao-deploy`): substituir **só** `index.html` + pasta `assets/` (apague os JS/CSS antigos). Não reenviar `proxy/openai.php`.
-
 **Próximo passo sugerido**
 
-- Histórico de gerações (localStorage) e exportar PDF ainda não feitos.
+- Exportar PDF ainda não feito.
 
 **Comandos úteis**
 
@@ -76,6 +81,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-08-19 | Dízimos e ofertas | Forma canônica dos três atos (dizimar / ofertar / primiciar), não concórdia de Malaquias |
 | 2026-08-19 | Aba Fundação | Fundação exegética/teológica como aba ao lado do conteúdo e dos 3 tipos |
 | 2026-08-20 | Deploy pack | `npm run deploy:pack` gera zip no Linux e no Windows; proxy só entra se `proxy/openai.php` existir |
+| 2026-08-20 | Compilado | Bíblia RA+NVI, Guardados, busca de significado e pasta de deploy completa |
 
 ---
 

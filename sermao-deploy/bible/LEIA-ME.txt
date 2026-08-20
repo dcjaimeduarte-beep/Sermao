@@ -1,0 +1,9 @@
+Nome nesta aplicação: Bíblia do Pb Jaime.
+
+Duas versões em português, versículo a versículo:
+- RA — Almeida Revista e Atualizada
+- NVI — Nova Versão Internacional
+
+Selecione uma palavra para consultar o dicionário e a enciclopédia do app.
+
+Fonte: projeto thiagobodruk/bible.

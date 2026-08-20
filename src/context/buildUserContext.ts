@@ -66,6 +66,10 @@ INCLUIR APLICAÇÃO PRÁTICA: ${request.incluirAplicacao ? "SIM — inclua aplic
 INCLUIR APELO FINAL: ${request.incluirApeloFinal ? "SIM — inclua um apelo ao final: evangelístico, de renovação ou de consagração, conforme o texto" : "NÃO — encerre sem apelo formal"}
 
 INCLUIR PERSPECTIVA DE MORDOMIA / DÍZIMOS E OFERTAS: ${isTithesOfferingsRequest(request) ? "SIM — o tema, a passagem ou o checkbox pedem esta lente. Siga o bloco TEMA ATIVO abaixo no conteúdo principal (não apenas no especialista)." : "NÃO — não force o tema de dízimos se o pedido for outro"}
+
+${request.textoBase
+  ? "MODO SERMÃO COM PASSAGEM: exegese para pregação VERSÍCULO A VERSÍCULO. Sem ilustrações. Parágrafos de no máximo 4 frases."
+  : "MODO SERMÃO SEM PASSAGEM: escolha 4 a 6 versículos principais do tema. Mesmo formato (Texto + Exegese + Aplicação). Sem ilustrações."}
 ════════════════════════════════════════
 ${isTithesOfferingsRequest(request) ? tithesOfferingsContext : ""}`;
 }
