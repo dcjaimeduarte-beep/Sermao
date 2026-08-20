@@ -27,7 +27,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Aplicação pessoal sempre (persona + o que o texto pede + passo da semana). O checkbox de aplicação prática controla só as ações do tipo “faça X na terça”.
 
 **Sermão**
-- Sem ilustração. Com passagem: versículo a versículo. Sem passagem: 4 a 6 versículos principais.
+- Voz do pregador-pastor-exegeta do GitHub **mantida**. Formato da sessão do PC **sobreposto no topo do prompt**: sem ilustração; com passagem = versículo a versículo; sem passagem = 4 a 6 versículos; no máximo 4 frases por versículo. Esboço e estudo **não** foram reescritos.
 
 **UI**
 - Fundação Exegética e Teológica é **aba**.
@@ -82,6 +82,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-08-19 | Aba Fundação | Fundação exegética/teológica como aba ao lado do conteúdo e dos 3 tipos |
 | 2026-08-20 | Deploy pack | `npm run deploy:pack` gera zip no Linux e no Windows; proxy só entra se `proxy/openai.php` existir |
 | 2026-08-20 | Compilado | Bíblia RA+NVI, Guardados, busca de significado e pasta de deploy completa |
+| 2026-08-20 | Revisão | Inventário: core GitHub intacto; Bíblia/Guardados preservados; formato do sermão alinhado sem apagar a voz |
 
 ---
 
