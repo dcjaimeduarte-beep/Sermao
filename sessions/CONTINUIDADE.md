@@ -34,9 +34,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Fundação Exegética e Teológica é **aba** (não bloco no fim da página): ao lado do sermão/esboço/estudo; nos 3 tipos: Sermão | Esboço | Estudo | Fundação.
 
 **Deploy**
-- Pacote gerado em 2026-08-20: `sermao-deploy.zip` (138.1 KB).
-- No servidor (`public_html/sermao-deploy`): substituir **só** `index.html` + pasta `assets/` (apague os JS/CSS antigos da pasta `assets/` para não acumular). Não reenviar `proxy/openai.php`.
-- Não commitar `proxy/openai.php` nem o zip.
+- Pasta pronta no projeto: **`sermao-deploy/`** (`index.html` + `assets/` + o zip). No servidor (`public_html/sermao-deploy`): substituir **só** `index.html` + pasta `assets/` (apague os JS/CSS antigos). Não reenviar `proxy/openai.php`.
 
 **Próximo passo sugerido**
 

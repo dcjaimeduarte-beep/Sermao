@@ -13,8 +13,8 @@ dist-web
 # PDFs de referência — grandes demais para GitHub (use Git LFS se necessário)
 docs/*.pdf
 
-# Pacote de deploy gerado automaticamente
-sermao-deploy.zip
+# Zip só na raiz (a cópia de upload fica em sermao-deploy/)
+/sermao-deploy.zip
 
 # Proxy com chave real — nunca commitar
 proxy/openai.php

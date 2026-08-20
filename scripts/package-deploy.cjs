@@ -18,6 +18,7 @@ const DEPLOY_ASSETS = path.join(ROOT, "deploy");
 const PROXY_SRC = path.join(ROOT, "proxy", "openai.php");
 const ZIP_NAME = "sermao-deploy.zip";
 const ZIP_PATH = path.join(ROOT, ZIP_NAME);
+const OUT_DIR = path.join(ROOT, "sermao-deploy");
 
 function log(msg) {
   console.log(`\n✦ ${msg}`);
@@ -26,6 +27,29 @@ function log(msg) {
 function copyFile(src, dest) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(src, dest);
+}
+
+function copyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const name of fs.readdirSync(src)) {
+    const from = path.join(src, name);
+    const to = path.join(dest, name);
+    if (fs.statSync(from).isDirectory()) copyDir(from, to);
+    else fs.copyFileSync(from, to);
+  }
+}
+
+function syncUploadFolder() {
+  fs.rmSync(OUT_DIR, { recursive: true, force: true });
+  fs.mkdirSync(path.join(OUT_DIR, "assets"), { recursive: true });
+  copyFile(path.join(DIST, "index.html"), path.join(OUT_DIR, "index.html"));
+  copyDir(path.join(DIST, "assets"), path.join(OUT_DIR, "assets"));
+  if (fs.existsSync(path.join(DIST, "bible"))) {
+    copyDir(path.join(DIST, "bible"), path.join(OUT_DIR, "bible"));
+  }
+  if (fs.existsSync(ZIP_PATH)) {
+    fs.copyFileSync(ZIP_PATH, path.join(OUT_DIR, ZIP_NAME));
+  }
 }
 
 function makeZip() {
@@ -74,17 +98,20 @@ if (fs.existsSync(PROXY_SRC)) {
 log(`Gerando ${ZIP_NAME}…`);
 makeZip();
 
-if (fs.existsSync(ZIP_PATH)) {
+log("Copiando pasta sermao-deploy/ (pronta para upload)…");
+syncUploadFolder();
+
+if (fs.existsSync(ZIP_PATH) && fs.existsSync(path.join(OUT_DIR, "index.html"))) {
   const size = (fs.statSync(ZIP_PATH).size / 1024).toFixed(1);
   console.log(`\n${"═".repeat(50)}`);
   console.log(`✓  Pacote gerado com sucesso!`);
-  console.log(`   Arquivo: ${ZIP_NAME} (${size} KB)`);
-  console.log(`   Local:   ${ZIP_PATH}`);
+  console.log(`   Pasta:   sermao-deploy/  ← envie index.html + assets/`);
+  console.log(`   Zip:     sermao-deploy/${ZIP_NAME} (${size} KB)`);
   console.log(`   Sistema: ${os.platform()}`);
   console.log(`\n   Conteúdo do pacote:`);
   console.log(listTree());
   console.log(`${"═".repeat(50)}\n`);
 } else {
-  console.error("✗  Erro: o arquivo .zip não foi gerado.");
+  console.error("✗  Erro: o pacote de deploy não foi gerado.");
   process.exit(1);
 }
