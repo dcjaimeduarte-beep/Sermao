@@ -14,7 +14,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 ## Estado atual
 
-**Última atualização:** 2026-08-20
+**Última atualização:** 2026-08-26
 
 **Onde estamos**
 
@@ -22,9 +22,16 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Pipeline multi-agente: principal (sermão / esboço / estudo) + apoio (Exegeta, Teólogo, Pregador/Esboçista, Mordomia quando o tema pede).
 
 **Esboço**
-- Solo do tópico (mundo original + sentido da ideia na época).
-- Texto original (heb./gr.) + transliteração + ARA + literal no solo e em cada ponto.
-- Aplicação pessoal sempre (persona + o que o texto pede + passo da semana). O checkbox de aplicação prática controla só as ações do tipo “faça X na terça”.
+- **# 1. INTRODUÇÃO** obrigatória nos três tipos (expositivo, textual, temático): o **livro** (cena, lugar no cânon, o que vem antes/depois) + a **palavra ou o tema em menção** (sentido então + ponte ao ouvinte). Percurso a partir do nº 2.
+- **Bloco-tipo** em cada movimento: título, citação, cena, 3 setas, contexto + 2–3 textos, aplicação pessoal, palavra profética.
+- Temático: introdução mapeia o tema no cânon. Textual: peso na palavra-chave. Expositivo: livro + perícope.
+
+**Estudo**
+- **# 1. INTRODUÇÃO**: o livro + a palavra/tema em menção + pergunta de abertura. Percurso didático a partir do nº 2.
+- Mesmo **bloco-tipo**, com nota ao líder, perguntas e dinâmica. Oração em 4 movimentos.
+
+**Sermão**
+- **# 1. INTRODUÇÃO** (livro + palavra/tema). Mesmo **bloco-tipo** no percurso (sem setas). Fecho: contrastes + declaração + frase final. Vários livros: 1º = eixo.
 
 **Sermão**
 - Sem ilustração. Com passagem: versículo a versículo. Sem passagem: 4 a 6 versículos principais.
@@ -41,9 +48,12 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Não é concórdia de Malaquias 3. O exegeta abstrai de toda a Bíblia a *forma do ato*: dizimar / ofertar / primiciar (incluindo textos onde o ato está e a palavra “dízimo” não está).
 - Liga sozinho se o tema/passagem falar disso (`isTithesOfferingsRequest`) ou se o checkbox de mordomia estiver marcado.
 
+**Imprimir / PDF**
+- Botão no resultado (sermão, esboço, estudo ou os 3 tipos). Abre o diálogo do navegador — escolha “Salvar como PDF”.
+
 **Próximo passo sugerido**
 
-- Exportar PDF ainda não feito.
+- Subir `index.html` + `assets/` + pasta `bible/` + favicons. Apague JS/CSS antigos em `assets/`. Não reenviar `proxy/openai.php`.
 
 **Comandos úteis**
 
@@ -82,6 +92,10 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 | 2026-08-19 | Aba Fundação | Fundação exegética/teológica como aba ao lado do conteúdo e dos 3 tipos |
 | 2026-08-20 | Deploy pack | `npm run deploy:pack` gera zip no Linux e no Windows; proxy só entra se `proxy/openai.php` existir |
 | 2026-08-20 | Compilado | Bíblia RA+NVI, Guardados, busca de significado e pasta de deploy completa |
+| 2026-08-21 | Imprimir / PDF | Botão no resultado abre o diálogo do navegador (salvar como PDF) |
+| 2026-08-26 | Sermão manuscrito numerado | Tópicos + contexto + palavra profética; cabeçalho com texto-chave |
+| 2026-08-26 | Vários livros | Lista de passagens (adicionar/remover); 1º livro é o eixo |
+| 2026-08-26 | Introdução do livro e da palavra | # 1. INTRODUÇÃO em esboço (os 3 tipos), sermão e estudo |
 
 ---
 

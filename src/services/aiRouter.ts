@@ -12,35 +12,47 @@ const AGENT_TIPO_CONTEUDO: Record<string, ContentType> = {
 /** Instrução final específica por agente — reforça o formato de saída esperado */
 const AGENT_USER_INSTRUCTION: Record<string, string> = {
   "sermon-agent": `
-Gere agora o SERMÃO COMPLETO E PREGÁVEL — pronto para o púlpito.
-NÃO produza esboço nem estudo bíblico.
-Sem ilustrações. Parágrafos curtos (no máximo 4 frases).
-Se houver passagem com capítulo e versículos: percorra VERSÍCULO A VERSÍCULO (Texto + Exegese + Aplicação em cada movimento).
-Se não houver passagem: escolha 4 a 6 versículos principais do tema e use o mesmo formato.
-Abertura e fecho curtos. Original só quando iluminar, em uma linha.`,
+Gere agora o SERMÃO PREGÁVEL no formato de MANUSCRITO NUMERADO.
+NÃO produza esboço, estudo, molde I/II/III, nem ilustrações.
+Cada movimento do percurso é um BLOCO-TIPO completo:
+- # N. TÍTULO (caixa alta, sem a referência no título)
+- citação em > com a referência
+- 3 a 6 linhas curtas da cena
+- ### Contexto + 2 a 3 textos que iluminam (citações)
+- ### Aplicação pessoal (persona)
+- # PALAVRA PROFÉTICA DESTE BLOCO
+Não entregue bloco raso (só título + 3 linhas + palavra). Expositivo, textual e temático usam o mesmo bloco.
+Cabeçalho + **# 1. INTRODUÇÃO** (o livro + a palavra/tema em menção). Percurso a partir do nº 2. Fecho: contrastes + declaração + frase final.
+Vários livros: uma composição; 1ª = eixo.`,
 
   "outline-agent": `
-Gere agora o ESBOÇO DE PREGAÇÃO — estrutura hierárquica e organizada, ferramenta para o pregador.
-NÃO produza texto corrido de sermão nem estudo com perguntas. Produza:
-- Solo do tópico rico: mundo original, o que o tópico significava então, ponte ao ouvinte
-- Texto original da época (hebraico/grego) + transliteração pronunciável + ARA + literal — no solo e em cada ponto
-- Proposição central em uma frase
-- Pontos numerados (I, II, III) com subtópicos em recuo
-- Cada ponto: exposição resumida + ilustração + aplicação pessoal (sempre: persona nomeada + o que o texto pede + passo da semana)
-- Seção de aplicações pessoais ao final (sempre: perguntas para casa + dois gestos da semana)
-- Aplicação prática do tipo "faça X na terça" apenas se INCLUIR APLICAÇÃO PRÁTICA for SIM
-- Material de apoio para o pregador ao final
-O esboço deve ser visualmente claro — o pregador precisa enxergar a estrutura de relance, mas com substância suficiente para pregar.`,
+Gere agora o ESBOÇO DE PÚLPITO.
+NÃO produza manuscrito corrido nem estudo de grupo. NÃO use I/II/III.
+TODOS os tipos (expositivo, textual e temático) usam o MESMO BLOCO-TIPO em cada movimento:
+- # N. TÍTULO
+- citação em > (referência)
+- linhas curtas da cena
+- 3 setas ➡️
+- ### Contexto + 2 a 3 textos que iluminam
+- ### Aplicação pessoal (sempre)
+- # PALAVRA PROFÉTICA DESTE BLOCO
+Temático NÃO é raso. Não pule contexto nem textos de fundo.
+Cabeçalho + **# 1. INTRODUÇÃO** (o livro + a palavra/tema em menção) + percurso em blocos a partir do nº 2 + fecho.
+Expositivo, textual e temático: a introdução muda o sabor (livro+perícope / palavra-chave / tema no cânon); o bloco do percurso é o mesmo.
+Vários livros: uma composição; 1ª = eixo.`,
 
   "study-agent": `
-Gere agora o ESTUDO BÍBLICO PARA GRUPO — material didático para célula, EBD ou discipulado.
-NÃO produza sermão nem esboço de pregação. Produza:
-- Pergunta de abertura para engajar o grupo
-- Explicação por tópicos (didática, acessível)
-- Perguntas de reflexão pessoal, compreensão e discussão em grupo
-- Aplicações práticas individuais e coletivas
-- Oração de encerramento sugerida
-O estudo deve convidar à participação e reflexão coletiva — não é uma mensagem para ouvir, é um material para estudar juntos.`,
+Gere agora o ESTUDO BÍBLICO PARA GRUPO no mesmo BLOCO-TIPO.
+NÃO produza sermão nem esboço com setas ➡️.
+Cada movimento:
+- # N. TÍTULO + Nota para o líder + citação em > + linhas da cena
+- ### Contexto + 2 a 3 textos que iluminam
+- ### Aplicação pessoal
+- ### Para o grupo (diagnóstico + desafio) + Dinâmica
+- # PALAVRA PROFÉTICA DESTE BLOCO
+Comece com **# 1. INTRODUÇÃO** (o livro + a palavra/tema em menção + pergunta de abertura). Percurso a partir do nº 2.
+Depois: lições, perguntas do encontro, oração em 4 movimentos, declaração, frase final.
+Frases curtas. Citações em bloco (>).`,
 };
 
 /**

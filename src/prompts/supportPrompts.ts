@@ -135,18 +135,15 @@ Analise a passagem informada e produza APENAS a seguinte estrutura:
 Uma frase completa que captura o coração da passagem para a pregação — o que a congregação deve crer, sentir ou fazer com base neste texto. (Comece com um verbo ou sujeito forte; evite frases vagas.)
 
 ### Estrutura Homilética Sugerida
-Ofereça 3 pontos principais para a pregação. Cada ponto deve:
-- Ter um título forte e memorável
-- Surgir diretamente do texto (não imposto sobre o texto)
-- Ter uma frase de desenvolvimento de 1 linha
-
-### Ilustrações Contemporâneas
-Sugira 2 ilustrações do cotidiano atual (não antiquadas nem genéricas) que conectem o texto à vida real da congregação. Indique para qual ponto cada ilustração serve.
+Ofereça os **movimentos do texto versículo a versículo** (não force 3 pontos). Cada movimento: referência + título curto + 1 frase de exegese para pregação + 1 frase de aplicação. Sem ilustrações.
 
 ### Pontes para Diferentes Públicos
 - Como pregar esta passagem para **crentes maduros**: aprofundar em qual aspecto?
 - Como pregar para **novos convertidos**: simplificar sem esvaziar — qual é o coração da mensagem?
 - Como pregar para **não convertidos**: qual verdade deste texto aponta para o evangelho?
+
+### Frase Final para Ministração
+3 blocos em voz de púlpito: retorno à cena de abertura, ponte direta ao ouvinte ("talvez você esteja..."), palavra final do texto.
 
 ### Apelo Final Sugerido
 Um apelo pastoral forte — seja de comprometimento, arrependimento, conforto ou consagração — que nasce diretamente do texto e é adequado ao público especificado.
@@ -218,32 +215,32 @@ Analise a passagem informada e produza APENAS a seguinte estrutura:
 
 ## Esboços Alternativos
 
-### Esboço 1 — Expositivo (verso a verso)
-Siga a ordem natural do texto:
-- **Título:**
-- **I.** [Ponto 1 — baseado na primeira parte do texto]
-  - Subtópico a
-  - Subtópico b
-- **II.** [Ponto 2]
-- **III.** [Ponto 3]
-- **Conclusão:**
+Cada esboço usa **movimentos do texto** (não molde I / II / III). Títulos pregáveis + 3 setas por tópico.
 
-### Esboço 2 — Temático (por tema central)
-Organize por ideias teológicas que emergem da passagem:
-- **Título:**
-- **I.** [Tema 1]
-- **II.** [Tema 2]
-- **III.** [Tema 3]
-- **Conclusão:**
+### Esboço 1 — Expositivo (cena a cena)
+Siga as viradas da perícope (5 a 7 tópicos se a narrativa pedir):
+- **TEMA:**
+- **TÓPICO 1 — [título]** | [ref.]
+  ➡️ ➡️ ➡️
+- (repita por tópico)
+- **Frase final para ministração:** [1 bloco]
 
-### Esboço 3 — Aplicacional (orientado à resposta)
-Organize em torno do que a congregação deve crer, sentir e fazer:
-- **Título:**
-- **I.** O que devemos CRER: [ponto doutrinal]
-- **II.** O que devemos SENTIR: [ponto afetivo/emocional]
-- **III.** O que devemos FAZER: [ponto prático]
-- **Conclusão:**
+### Esboço 2 — Temático (por ideia central)
+4 a 6 movimentos do argumento:
+- **TEMA:**
+- **TÓPICO 1 — [título]**
+  ➡️ ➡️ ➡️
+- (repita)
+- **Frase final:** [1 bloco]
+
+### Esboço 3 — Aplicacional (resposta do ouvinte)
+Organize em torno da tensão da congregação, ainda ancorado no texto:
+- **TEMA:**
+- **TÓPICO 1 — [título que nomeia a tensão]**
+  ➡️ ➡️ ➡️
+- (repita, 4 a 6)
+- **Frase final:** [ponte ao ouvinte + palavra do texto]
 
 ### Dica Homilética
-Uma observação prática sobre qual esboço funciona melhor para este texto específico e por quê.
+Qual esboço serve melhor a este texto e por quê. Indique onde desacelerar e qual frase deve fechar a mensagem.
 `;

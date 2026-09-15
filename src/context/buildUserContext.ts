@@ -1,6 +1,7 @@
 import type { UserRequest } from "@/domain";
 import { tithesOfferingsContext } from "@/prompts/tithesOfferingsContext";
 import { isTithesOfferingsRequest } from "./isTithesOfferingsRequest";
+import { passagensDoPedido } from "./passagensDoPedido";
 
 const TIPO_SERMAO_DESC: Record<string, string> = {
   expositivo: "Expositivo — percorre o texto versículo a versículo ou perícope por perícope, deixando a estrutura do próprio texto determinar os pontos da mensagem",
@@ -10,7 +11,7 @@ const TIPO_SERMAO_DESC: Record<string, string> = {
 
 const PUBLICO_DESC: Record<string, string> = {
   misto:          "Público geral — congregação mista, adultos de diferentes idades e maturidade espiritual; use linguagem acessível mas não simplista",
-  jovens:         "Jovens — linguagem dinâmica, conectada à cultura contemporânea, ilustrações do cotidiano jovem, desafios e questões de identidade e propósito",
+  jovens:         "Jovens — linguagem dinâmica, conectada à cultura contemporânea, desafios e questões de identidade e propósito",
   criancas:       "Crianças — linguagem muito simples e concreta, histórias e imagens visuais, sem abstrações teológicas complexas, verdades simples e memoráveis",
   adolescentes:   "Adolescentes — linguagem direta e honesta, temas de identidade, pertencimento, fé e vida prática; evite tom condescendente",
   mulheres:       "Mulheres — contexto pastoral sensível, temas de fé no cotidiano, família, propósito e identidade em Cristo",
@@ -31,6 +32,22 @@ export function buildUserContext(request: UserRequest): string {
 
   const publicoDesc   = PUBLICO_DESC[request.publico]   ?? request.publico;
   const profDesc      = PROFUNDIDADE_DESC[request.profundidade ?? "media"] ?? request.profundidade;
+  const passagens     = passagensDoPedido(request);
+  const [passagemEixo, ...passagensMais] = passagens;
+
+  const blocoPassagens = passagemEixo
+    ? `PASSAGEM BÍBLICA PRINCIPAL (eixo): ${passagemEixo}
+→ Há capítulo e versículos. No SERMÃO: percorra este texto como eixo da mensagem (versículo a versículo, agrupando só 2–3 vv. inseparáveis). Não monte I/II/III temáticos no lugar do texto.
+${passagensMais.length
+    ? `PASSAGENS COMPLEMENTARES (${passagensMais.length}):
+${passagensMais.map((p, i) => `  ${i + 2}ª — ${p}`).join("\n")}
+→ O sermão é UMA composição com TODOS estes livros — não sermões colados, nem as complementares como nota de rodapé.
+→ A 1ª passagem é o eixo. Cada livro adicional dialoga com ela (contraste, cumprimento, paralelo, ampliação).
+→ No cabeçalho, liste todas em Texto principal. O texto-chave vem em geral da 1ª.
+→ Se a duração não couber percorrer cada perícope por completo: esgote o eixo; nas demais, só os versículos que realmente conversam com o tema.`
+    : ""}`
+    : `PASSAGEM BÍBLICA PRINCIPAL: não informada
+→ Não há passagem. No SERMÃO: use o TEMA e o CONTEXTO PASTORAL; escolha 4 a 6 versículos principais da Escritura (AT e NT) e componha o manuscrito numerado em torno deles.`;
 
   return `
 ════════════════════════════════════════
@@ -43,17 +60,15 @@ TIPO DE SERMÃO: ${tipoSermaoDesc}
 → Aplique esta abordagem rigorosamente na estrutura e no desenvolvimento da mensagem.
 
 PÚBLICO-ALVO: ${publicoDesc}
-→ Adapte vocabulário, ilustrações, tom e nível de detalhe a este público específico.
+→ Adapte vocabulário, tom e nível de detalhe a este público específico.
 
 PROFUNDIDADE TEOLÓGICA: ${profDesc}
 → Calibre o nível de análise, a complexidade da linguagem e a quantidade de detalhe técnico conforme esta instrução.
 
 DURAÇÃO ESTIMADA: ${request.duracaoMinutos} minutos
-→ Dimensione o volume de conteúdo proporcionalmente. Um sermão de 20 min tem menos pontos e desenvolvimento mais enxuto que um de 60 min.
+→ Dimensione o volume proporcionalmente: sermão curto = menos seções e blocos mais enxutos; 30–45 min = eixo versículo a versículo (ou 4–6 versículos principais se não houver passagem).
 
-PASSAGEM BÍBLICA PRINCIPAL: ${request.textoBase ?? "não informada — selecione passagens relevantes com base no tema"}
-${request.textoBase2 ? `PASSAGEM BÍBLICA COMPLEMENTAR: ${request.textoBase2}
-→ Duas passagens foram informadas. Use-as em diálogo: uma fundamenta, a outra aprofunda, ou ambas convergem para a mesma verdade central. Mostre como se iluminam mutuamente. A passagem principal ancora o desenvolvimento; a complementar enriquece, confirma ou amplia.` : ""}
+${blocoPassagens}
 TEMA OU TÍTULO SUGERIDO: ${request.tema ?? "não informado"}
 
 CONTEXTO PASTORAL: ${request.contextoGeracao?.trim() ? request.contextoGeracao.trim() : "não informado"}
@@ -61,7 +76,7 @@ CONTEXTO PASTORAL: ${request.contextoGeracao?.trim() ? request.contextoGeracao.t
 
 INCLUIR CONTEXTO HISTÓRICO E LITERÁRIO: ${request.incluirContextoHistorico ? "SIM — desenvolva o contexto histórico, cultural e literário onde for relevante" : "NÃO — omita seções de contexto histórico; foque em exposição e aplicação"}
 
-INCLUIR APLICAÇÃO PRÁTICA: ${request.incluirAplicacao ? "SIM — inclua aplicações concretas, com prazo e contexto real, em cada ponto" : "NÃO — omita seções de aplicação; foque na exposição e na explicação teológica"}
+INCLUIR APLICAÇÃO PRÁTICA: ${request.incluirAplicacao ? "SIM — aplicação concreta em cada versículo/movimento" : "NÃO — omita o bloco Aplicação; só exegese para pregação"}
 
 INCLUIR APELO FINAL: ${request.incluirApeloFinal ? "SIM — inclua um apelo ao final: evangelístico, de renovação ou de consagração, conforme o texto" : "NÃO — encerre sem apelo formal"}
 

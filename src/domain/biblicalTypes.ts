@@ -17,8 +17,12 @@ export interface UserRequest {
   publico: AudienceType;
   duracaoMinutos: number;
   tema?: string;
+  /** Primeira passagem — eixo da mensagem. */
   textoBase?: string;
+  /** Segunda passagem (compatibilidade). Prefira `textosBase`. */
   textoBase2?: string;
+  /** Todas as passagens na ordem (a primeira é o eixo). */
+  textosBase?: string[];
   /** Notas, situação da igreja, objetivos pastorais — incluído no pedido ao modelo. */
   contextoGeracao?: string;
   profundidade?: "simples" | "media" | "profunda";

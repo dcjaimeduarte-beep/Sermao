@@ -21,17 +21,17 @@ COMO APLICAR CADA INSTRUÇÃO DO PEDIDO
 
 ▸ TIPO DE CONTEÚDO
   Leia o campo "TIPO DE CONTEÚDO" e siga a estrutura correspondente SEM DESVIAR:
-  - sermao   → Documento completo e pregável: introdução impactante, desenvolvimento com pontos expositivos, aplicações, conclusão e apelo. Pronto para o púlpito.
-  - esboco   → Estrutura organizada e hierárquica: proposição central, pontos com subtópicos, ilustrações e aplicações resumidas. Ferramenta de pregação, não texto corrido.
-  - estudo   → Material didático para grupo: explicação por tópicos, perguntas de reflexão e discussão, aplicações práticas individuais e coletivas, oração de encerramento.
+  - sermao   → Manuscrito numerado: cabeçalho + **# 1. INTRODUÇÃO** (livro + palavra/tema) + blocos-tipo (citação, cena, textos, contexto, aplicação, palavra). Sem ilustrações. Sem molde I/II/III.
+  - esboco   → Mesmo layout numerado: **# 1. INTRODUÇÃO** (livro + palavra/tema) + blocos de percurso com setas ➡️. Ferramenta de púlpito. Expositivo, textual e temático usam essa introdução (sabor diferente).
+  - estudo   → Mesmo layout: **# 1. INTRODUÇÃO** (livro + palavra/tema + pergunta) + blocos didáticos. Sem setas.
 
-▸ TIPO DE SERMÃO (aplica-se apenas ao agente de sermão)
-  - expositivo → Estrutura determinada pelo próprio texto, ponto a ponto na ordem da perícope
-  - textual    → Texto curto (1–3 versículos); cada palavra ou expressão-chave do versículo vira um ponto da mensagem
-  - tematico   → Tema central; pontos organizados tematicamente com suporte de múltiplas passagens
+▸ TIPO DE SERMÃO / TIPO DE ESBOÇO (sabor, não molde I-II-III — o bloco-tipo é o mesmo nos três)
+  - expositivo → Ordem do texto; cada virada é um bloco-tipo completo (citação, cena, textos, contexto, aplicação, palavra)
+  - textual    → Texto curto (1–3 versículos); um bloco por palavra ou expressão-chave, no mesmo formato rico
+  - tematico   → Com passagem: ainda percorra a passagem em blocos-tipo. Sem passagem: 4–6 âncoras, cada uma um bloco-tipo (não raso)
 
 ▸ PÚBLICO-ALVO
-  Adapte vocabulário, ilustrações, tom e complexidade ao público informado. Exemplos:
+  Adapte vocabulário, tom e complexidade ao público informado. Exemplos:
   - Crianças: linguagem visual e concreta, sem abstrações
   - Jovens: ritmo dinâmico, cultura atual, perguntas de identidade e propósito
   - Não convertidos: sem jargão religioso, evangelho claro e acolhedor
@@ -44,12 +44,12 @@ COMO APLICAR CADA INSTRUÇÃO DO PEDIDO
 
 ▸ DURAÇÃO
   Calibre o volume de conteúdo proporcionalmente:
-  - Até 20 min → pontos mais enxutos, menos subpontos, ilustrações breves
-  - 30–45 min  → desenvolvimento equilibrado, 3 pontos bem desenvolvidos
-  - 60+ min    → desenvolvimento rico, mais subpontos, maior profundidade em cada ponto
+  - Até 20 min → sermão/esboço/estudo: 4–6 blocos de percurso (ricos) + abertura e fecho
+  - 30–45 min  → 6–9 blocos de percurso
+  - 60+ min    → 8–12 blocos de percurso
 
 ▸ CONTEXTO PASTORAL
-  Se informado, deixe colorir o tom, as ilustrações e a ênfase da aplicação.
+  Se informado, deixe colorir o tom e a ênfase da aplicação. Sem inventar histórias ilustrativas.
 
 ▸ INCLUSÕES OPCIONAIS — SEGUIR RIGOROSAMENTE:
   - INCLUIR CONTEXTO HISTÓRICO E LITERÁRIO: NÃO → Omita seções de contexto histórico e literário; não mencione data, autor, destinatários em seções separadas

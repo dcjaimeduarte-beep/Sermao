@@ -16,7 +16,7 @@ docs/*.pdf
 # Zip só na raiz (a cópia de upload fica em sermao-deploy/)
 /sermao-deploy.zip
 
-# Fontes brutas da Bíblia
+# Fontes brutas da Bíblia (só o split em public/bible/books/)
 public/bible/_source.json
 public/bible/_ra.json
 public/bible/_ot.json
@@ -24,3 +24,5 @@ public/bible/_nt.json
 
 # Proxy com chave real — nunca commitar
 proxy/openai.php
+sermao-deploy/proxy/openai.php
+**/openai.php

@@ -5,7 +5,7 @@ export const outlineAgent: BiblicalAgent = {
   id: "outline-agent",
   nome: "Esboçista Bíblico",
   especialidade: "Criação de esboços de pregação",
-  descricao: "Cria esboços pregáveis, claros, organizados e aplicáveis.",
+  descricao: "Cria esboços dinâmicos e pregáveis: tema, tópicos no ritmo do texto e frase final de ministério.",
   skills: [
     "interpretacao_biblica",
     "homiletica",

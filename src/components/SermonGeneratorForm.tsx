@@ -1,19 +1,18 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { AudienceType, ContentType, GeneratedContent, SermonStyle, UserRequest } from "@/domain";
-import type { FooterInfo, SavedLibraryItem } from "@/domain/library.types";
+import type { AudienceType, ContentType, FooterInfo, GeneratedContent, SavedLibraryItem, SermonStyle, UserRequest } from "@/domain";
 import { masterAgent, masterAgentAll } from "@/agents/masterAgent";
 import { runAgent, runAllMainAgents, runSupportAgents } from "@/services/aiRouter";
+import { deleteLibraryItem, loadLibrary, saveLibraryItem } from "@/services/contentLibrary";
 import { BIBLE_BOOKS_PT } from "@/data/bibleBooks.pt";
 import { BIBLE_NAME } from "@/data/bibleCatalog";
-import { loadLibrary, saveLibraryItem } from "@/services/contentLibrary";
+import { SavedLibraryPanel } from "./SavedLibraryPanel";
 import { BiblePassageModal } from "./BiblePassageModal";
 import { BibleReader } from "./BibleReader";
-import { SavedLibraryPanel } from "./SavedLibraryPanel";
 
 const CONTENT_TYPE_OPTIONS: { value: ContentType; label: string; desc: string }[] = [
-  { value: "sermao", label: "Sermão", desc: "Pregação completa com introdução, desenvolvimento e conclusão" },
-  { value: "esboco", label: "Esboço", desc: "Estrutura organizada com tópicos e subtópicos para pregar" },
-  { value: "estudo", label: "Estudo Bíblico", desc: "Material didático para células, EBD ou discipulado" },
+  { value: "sermao", label: "Sermão", desc: "Manuscrito numerado: tópicos, contexto, original e palavra profética" },
+  { value: "esboco", label: "Esboço", desc: "Mesmo layout numerado, em versão de púlpito: tópicos, setas e palavra profética" },
+  { value: "estudo", label: "Estudo Bíblico", desc: "Mesmo layout numerado, em versão didática: perguntas, dinâmica e palavra profética" },
 ];
 
 const PUBLICO_OPTIONS: { value: AudienceType; label: string }[] = [
@@ -55,6 +54,24 @@ function buildTextoBase(livro: string, capitulo: string, versiculos: string): st
   const ver = versiculos.trim();
   if (!livro || !cap) return "";
   return ver ? `${livro} ${cap}:${ver}` : `${livro} ${cap}`;
+}
+
+const MAX_PASSAGENS = 6;
+
+type PassageRow = {
+  id: string;
+  livro: string;
+  capitulo: string;
+  versiculos: string;
+};
+
+function newPassageRow(livro = "", capitulo = "", versiculos = ""): PassageRow {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    livro,
+    capitulo,
+    versiculos,
+  };
 }
 
 // ── Referências cruzadas bíblicas ──────────────────────────────────────────
@@ -119,11 +136,23 @@ function renderInline(text: string, onBibleRef?: (ref: string) => void): React.R
   });
 }
 
+function headingClass(level: 1 | 2, text: string, isFirstOfLevel: boolean): string {
+  if (level === 2) {
+    return isFirstOfLevel ? "so-h2 so-h2-kicker" : "so-h2";
+  }
+  if (isFirstOfLevel) return "so-h1 so-h1-title";
+  if (/^\d+\.\s/.test(text)) return "so-h1 so-h1-section";
+  return "so-h1 so-h1-word";
+}
+
 function renderSermonContent(text: string, onBibleRef?: (ref: string) => void): React.ReactNode {
   const lines = text.split("\n");
   const nodes: React.ReactNode[] = [];
   let listItems: string[] = [];
+  let quoteItems: string[] = [];
   let key = 0;
+  let seenH1 = false;
+  let seenH2 = false;
 
   const flushList = () => {
     if (listItems.length === 0) return;
@@ -137,38 +166,85 @@ function renderSermonContent(text: string, onBibleRef?: (ref: string) => void): 
     listItems = [];
   };
 
+  const flushQuote = () => {
+    if (quoteItems.length === 0) return;
+    nodes.push(
+      <blockquote key={key++} className="so-quote">
+        {quoteItems.map((item, i) =>
+          item.trim() === "" ? (
+            <div key={i} className="so-quote-gap" />
+          ) : (
+            <p key={i}>{renderInline(item, onBibleRef)}</p>
+          )
+        )}
+      </blockquote>
+    );
+    quoteItems = [];
+  };
+
+  const flushBlocks = () => {
+    flushList();
+    flushQuote();
+  };
+
   for (const line of lines) {
-    if (line.startsWith("#### ")) {
+    if (line.startsWith(">")) {
       flushList();
+      quoteItems.push(line.replace(/^>\s?/, ""));
+      continue;
+    }
+
+    if (line.startsWith("#### ")) {
+      flushBlocks();
       nodes.push(<h4 key={key++} className="so-h4">{renderInline(line.slice(5), onBibleRef)}</h4>);
     } else if (line.startsWith("### ")) {
-      flushList();
+      flushBlocks();
       nodes.push(<h3 key={key++} className="so-h3">{renderInline(line.slice(4), onBibleRef)}</h3>);
     } else if (line.startsWith("## ")) {
-      flushList();
-      nodes.push(<h2 key={key++} className="so-h2">{renderInline(line.slice(3), onBibleRef)}</h2>);
+      flushBlocks();
+      const body = line.slice(3);
+      const isKicker = seenH1 && !seenH2;
+      seenH2 = true;
+      nodes.push(
+        <h2 key={key++} className={headingClass(2, body, isKicker)}>
+          {renderInline(body, onBibleRef)}
+        </h2>
+      );
     } else if (line.startsWith("# ")) {
-      flushList();
-      nodes.push(<h1 key={key++} className="so-h1">{renderInline(line.slice(2), onBibleRef)}</h1>);
+      flushBlocks();
+      const body = line.slice(2);
+      const isFirst = !seenH1;
+      seenH1 = true;
+      nodes.push(
+        <h1 key={key++} className={headingClass(1, body, isFirst)}>
+          {renderInline(body, onBibleRef)}
+        </h1>
+      );
     } else if (line.match(/^---+$/)) {
-      flushList();
+      flushBlocks();
       nodes.push(<hr key={key++} className="so-divider" />);
     } else if (line.match(/^═+$/)) {
-      flushList();
+      flushBlocks();
       nodes.push(<hr key={key++} className="so-divider-strong" />);
     } else if (line.startsWith("- ") || line.startsWith("• ")) {
+      flushQuote();
       listItems.push(line.replace(/^[-•] /, ""));
     } else if (line.startsWith("✓ ") || line.startsWith("✗ ")) {
+      flushQuote();
       listItems.push(line);
+    } else if (line.startsWith("➡️ ") || line.startsWith("➡️")) {
+      flushBlocks();
+      const arrowText = line.replace(/^➡️\s?/, "");
+      nodes.push(<p key={key++} className="so-p so-arrow">{renderInline(arrowText, onBibleRef)}</p>);
     } else if (line.trim() === "") {
-      flushList();
+      flushBlocks();
       nodes.push(<div key={key++} className="so-gap" />);
     } else {
-      flushList();
+      flushBlocks();
       nodes.push(<p key={key++} className="so-p">{renderInline(line, onBibleRef)}</p>);
     }
   }
-  flushList();
+  flushBlocks();
   return <>{nodes}</>;
 }
 
@@ -333,12 +409,12 @@ interface AllTypesResultProps {
   apoio: SupportResult[] | null;
   footerInfo: FooterInfo;
   onNovo: () => void;
-  onBibleRef?: (ref: string) => void;
   onSave: () => void;
-  savedFlash?: boolean;
+  jaGuardado: boolean;
+  onBibleRef?: (ref: string) => void;
 }
 
-function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onSave, savedFlash }: AllTypesResultProps) {
+function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onSave, jaGuardado, onBibleRef }: AllTypesResultProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -376,8 +452,21 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onS
             >
               {copied ? "✓ Copiado" : "Copiar"}
             </button>
-            <button type="button" className="sgf-action-btn" onClick={onSave}>
-              {savedFlash ? "✓ Guardado" : "Salvar"}
+            <button
+              type="button"
+              className="sgf-action-btn"
+              onClick={() => window.print()}
+              title="Imprimir ou salvar em PDF"
+            >
+              Imprimir / PDF
+            </button>
+            <button
+              type="button"
+              className={`sgf-action-btn${jaGuardado ? " is-copied" : ""}`}
+              onClick={onSave}
+              disabled={jaGuardado}
+            >
+              {jaGuardado ? "✓ Guardado" : "Salvar"}
             </button>
             <button
               type="button"
@@ -427,13 +516,7 @@ function AllTypesResult({ resultados, apoio, footerInfo, onNovo, onBibleRef, onS
 export function SermonGeneratorForm() {
   const [tipoConteudo, setTipoConteudo] = useState<ContentType>("sermao");
   const [usarPassagem, setUsarPassagem] = useState(false);
-  const [livro, setLivro] = useState("");
-  const [capitulo, setCapitulo] = useState("");
-  const [versiculos, setVersiculos] = useState("");
-  const [usarSegundaPassagem, setUsarSegundaPassagem] = useState(false);
-  const [livro2, setLivro2] = useState("");
-  const [capitulo2, setCapitulo2] = useState("");
-  const [versiculos2, setVersiculos2] = useState("");
+  const [passagens, setPassagens] = useState<PassageRow[]>([]);
   const [tema, setTema] = useState("");
   const [contexto, setContexto] = useState("");
   const [publico, setPublico] = useState<AudienceType>("misto");
@@ -463,22 +546,18 @@ export function SermonGeneratorForm() {
   const [bibleRef, setBibleRef] = useState<string | null>(null);
   const [bibleOpen, setBibleOpen] = useState(false);
   const [readerLoc, setReaderLoc] = useState({ bookId: "joao", chapter: 1 });
-  const [library, setLibrary] = useState<SavedLibraryItem[]>(() => loadLibrary());
-  const [savedFlash, setSavedFlash] = useState(false);
   const [outputTab, setOutputTab] = useState<"conteudo" | "fundacao">("conteudo");
+  const [libraryItems, setLibraryItems] = useState<SavedLibraryItem[]>(() => loadLibrary());
+  const [currentLibraryId, setCurrentLibraryId] = useState<string | null>(null);
   const stageTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const todosRef = useRef<HTMLDivElement>(null);
 
-  const textoBasePreview = useMemo(
-    () => buildTextoBase(livro, capitulo, versiculos),
-    [livro, capitulo, versiculos]
+  const textosBasePreview = useMemo(
+    () => passagens.map((p) => buildTextoBase(p.livro, p.capitulo, p.versiculos)).filter(Boolean),
+    [passagens]
   );
-
-  const textoBase2Preview = useMemo(
-    () => buildTextoBase(livro2, capitulo2, versiculos2),
-    [livro2, capitulo2, versiculos2]
-  );
+  const passagensLabel = textosBasePreview.join(" · ");
 
   const montarPedido = useCallback((): UserRequest => ({
     tipoConteudo,
@@ -486,8 +565,9 @@ export function SermonGeneratorForm() {
     publico,
     duracaoMinutos: Math.max(5, Math.min(180, duracaoMinutos)),
     tema: tema.trim() || undefined,
-    textoBase: textoBasePreview || undefined,
-    textoBase2: (usarSegundaPassagem && textoBase2Preview) ? textoBase2Preview : undefined,
+    textoBase: textosBasePreview[0],
+    textoBase2: textosBasePreview[1],
+    textosBase: textosBasePreview.length ? textosBasePreview : undefined,
     contextoGeracao: [
       contexto.trim(),
       pastor.trim() ? `Pastor(a): ${pastor.trim()}` : "",
@@ -498,7 +578,19 @@ export function SermonGeneratorForm() {
     incluirAplicacao,
     incluirApeloFinal,
     incluirMordomia,
-  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textoBasePreview, textoBase2Preview, usarSegundaPassagem, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal, incluirMordomia]);
+  }), [tipoConteudo, tipoSermao, publico, duracaoMinutos, tema, textosBasePreview, contexto, pastor, igreja, profundidade, incluirContextoHistorico, incluirAplicacao, incluirApeloFinal, incluirMordomia]);
+
+  function updatePassagem(id: string, patch: Partial<Omit<PassageRow, "id">>) {
+    setPassagens((rows) => rows.map((row) => (row.id === id ? { ...row, ...patch } : row)));
+  }
+
+  function removePassagem(id: string) {
+    setPassagens((rows) => (rows.length <= 1 ? rows : rows.filter((row) => row.id !== id)));
+  }
+
+  function addPassagem() {
+    setPassagens((rows) => (rows.length >= MAX_PASSAGENS ? rows : [...rows, newPassageRow()]));
+  }
 
   async function handleGerarTodos() {
     setErro(null);
@@ -511,8 +603,9 @@ export function SermonGeneratorForm() {
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
     setOutputTab("conteudo");
+    setCurrentLibraryId(null);
 
-    if (!textoBasePreview && !tema.trim()) {
+    if (!textosBasePreview.length && !tema.trim()) {
       setErro("Informe pelo menos um tema ou uma passagem bíblica.");
       return;
     }
@@ -531,7 +624,7 @@ export function SermonGeneratorForm() {
       setResultadosTodos(todos);
       setPesquisaTodos(suportes);
       setFooterInfoTodos({
-        passagem: textoBasePreview || tema.trim() || "Tema livre",
+        passagem: passagensLabel || tema.trim() || "Tema livre",
         tipo: "Sermão · Esboço · Estudo",
         publico,
         duracao: duracaoMinutos,
@@ -567,8 +660,9 @@ export function SermonGeneratorForm() {
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
     setOutputTab("conteudo");
+    setCurrentLibraryId(null);
 
-    if (!textoBasePreview && !tema.trim()) {
+    if (!textosBasePreview.length && !tema.trim()) {
       setErro("Informe pelo menos um tema ou uma passagem bíblica.");
       return;
     }
@@ -604,7 +698,7 @@ export function SermonGeneratorForm() {
         : tipoLabel;
 
       setFooterInfo({
-        passagem: textoBasePreview || tema.trim() || "Tema livre",
+        passagem: passagensLabel || tema.trim() || "Tema livre",
         tipo: tipoSermaoLabel,
         publico,
         duracao: duracaoMinutos,
@@ -653,55 +747,8 @@ export function SermonGeneratorForm() {
     });
   }
 
-  function flashSaved() {
-    setSavedFlash(true);
-    window.setTimeout(() => setSavedFlash(false), 2000);
-  }
-
-  function handleSalvarUnico() {
-    if (!saida || !footerInfo) return;
-    setLibrary(
-      saveLibraryItem({
-        id: `${Date.now()}`,
-        savedAt: Date.now(),
-        kind: "unico",
-        tipoLabel,
-        title: footerInfo.passagem || tema.trim() || tipoLabel,
-        content: saida,
-        footer: footerInfo,
-        support: pesquisaEspecializada?.map((r) => ({
-          label: r.label,
-          icone: r.icone,
-          content: r.content,
-        })),
-      })
-    );
-    flashSaved();
-  }
-
-  function handleSalvarTodos() {
-    if (!resultadosTodos || !footerInfoTodos) return;
-    setLibrary(
-      saveLibraryItem({
-        id: `${Date.now()}`,
-        savedAt: Date.now(),
-        kind: "tres",
-        tipoLabel: "3 tipos",
-        title: footerInfoTodos.passagem || tema.trim() || "3 tipos",
-        content: resultadosTodos.map((r) => r.content).join("\n\n"),
-        allContents: resultadosTodos.map((r, i) => ({
-          label: TODOS_TIPOS[i]?.label ?? r.agentName,
-          content: r.content,
-        })),
-        footer: footerInfoTodos,
-        support: pesquisaTodos?.map((r) => ({
-          label: r.label,
-          icone: r.icone,
-          content: r.content,
-        })),
-      })
-    );
-    flashSaved();
+  function handlePrint() {
+    window.print();
   }
 
   function handleNovo() {
@@ -715,11 +762,92 @@ export function SermonGeneratorForm() {
     setPesquisaTodos(null);
     setFooterInfoTodos(null);
     setOutputTab("conteudo");
+    setCurrentLibraryId(null);
     setUsarPassagem(false);
+    setPassagens([]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function tituloGuardado(): string {
+    return tema.trim() || passagensLabel || footerInfo?.passagem || footerInfoTodos?.passagem || "Sem título";
+  }
+
+  function handleSalvarAtual() {
+    if (currentLibraryId) return;
+    try {
+      if (resultadosTodos && footerInfoTodos) {
+        const item = saveLibraryItem({
+          kind: "todos",
+          title: tituloGuardado(),
+          passagem: footerInfoTodos.passagem,
+          tipoLabel: footerInfoTodos.tipo,
+          footerInfo: footerInfoTodos,
+          resultadosTodos,
+          pesquisaTodos: pesquisaTodos ?? undefined,
+        });
+        setCurrentLibraryId(item.id);
+        setLibraryItems(loadLibrary());
+        return;
+      }
+      if (!saida || !footerInfo) return;
+      const item = saveLibraryItem({
+        kind: tipoConteudo,
+        title: tituloGuardado(),
+        passagem: footerInfo.passagem,
+        tipoLabel: footerInfo.tipo,
+        footerInfo,
+        content: saida,
+        pesquisa: pesquisaEspecializada ?? undefined,
+      });
+      setCurrentLibraryId(item.id);
+      setLibraryItems(loadLibrary());
+    } catch {
+      setErro("Não foi possível salvar. O armazenamento deste navegador pode estar cheio.");
+    }
+  }
+
+  function handleAbrirGuardado(item: SavedLibraryItem) {
+    setErro(null);
+    setCopied(false);
+    setApoioLabels([]);
+    setOutputTab("conteudo");
+    setCurrentLibraryId(item.id);
+
+    if (item.kind === "todos") {
+      setSaida(null);
+      setFooterInfo(null);
+      setPesquisaEspecializada(null);
+      setResultadosTodos(item.resultadosTodos ?? []);
+      setPesquisaTodos(item.pesquisaTodos ?? null);
+      setFooterInfoTodos(item.footerInfo);
+      setTimeout(() => {
+        todosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+      return;
+    }
+
+    setResultadosTodos(null);
+    setPesquisaTodos(null);
+    setFooterInfoTodos(null);
+    setTipoConteudo(item.kind);
+    setSaida(item.content ?? "");
+    setPesquisaEspecializada(item.pesquisa ?? null);
+    setFooterInfo(item.footerInfo);
+    setTimeout(() => {
+      outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  }
+
+  function handleExcluirGuardado(id: string) {
+    const alvo = libraryItems.find((item) => item.id === id);
+    const nome = alvo?.title ?? "este material";
+    if (!window.confirm(`Excluir "${nome}"? Isso não pode ser desfeito.`)) return;
+    setLibraryItems(deleteLibraryItem(id));
+    if (currentLibraryId === id) setCurrentLibraryId(null);
+  }
+
   const tipoLabel = CONTENT_TYPE_OPTIONS.find((o) => o.value === tipoConteudo)?.label ?? "Conteúdo";
+  const jaGuardado = currentLibraryId !== null;
 
   return (
     <div className="sgf-wrap">
@@ -727,14 +855,12 @@ export function SermonGeneratorForm() {
       <header className="sgf-header">
         <div className="sgf-header-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="44" height="44" aria-hidden="true">
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" fill="currentColor" opacity=".12"/>
-            <rect x="6" y="4" width="30" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.2" fill="none"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" fill="currentColor" opacity=".22"/>
-            <rect x="6" y="4" width="7" height="40" rx="3" ry="3" stroke="currentColor" strokeWidth="2.2" fill="none"/>
-            <line x1="16" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            <line x1="16" y1="19" x2="30" y2="19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            <line x1="16" y1="24" x2="26" y2="24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            <path d="M23 31 L26 28 L29 31 L29 39 L26 37 L23 39 Z" fill="currentColor" opacity=".7" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+            <rect x="11" y="6" width="26" height="36" rx="2.5" fill="currentColor" opacity=".14"/>
+            <rect x="11" y="6" width="26" height="36" rx="2.5" stroke="currentColor" strokeWidth="2.2" fill="none"/>
+            <rect x="11" y="6" width="5" height="36" rx="1.5" fill="currentColor" opacity=".28"/>
+            <rect x="11" y="6" width="5" height="36" rx="1.5" stroke="currentColor" strokeWidth="2.2" fill="none"/>
+            <path d="M24 14v16M16.5 22h15" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M22 38h4v4h-4z" fill="currentColor" opacity=".75"/>
           </svg>
         </div>
         <div>
@@ -743,51 +869,21 @@ export function SermonGeneratorForm() {
             Sermões, esboços e estudos com exegese do original, textos paralelos e aplicação pastoral em linguagem atual.
           </p>
         </div>
-        <div className="sgf-header-actions">
-          <SavedLibraryPanel
-            items={library}
-            onChange={setLibrary}
-            onOpen={(item) => {
-              if (item.kind === "tres" && item.allContents) {
-                setResultadosTodos(
-                  item.allContents.map((row, i) => ({
-                    agentId: `saved-${i}`,
-                    agentName: row.label,
-                    content: row.content,
-                  }))
-                );
-                setPesquisaTodos(
-                  (item.support ?? []).map((s) => ({
-                    agentId: s.label,
-                    agentName: s.label,
-                    label: s.label,
-                    icone: s.icone ?? "🔍",
-                    content: s.content,
-                  }))
-                );
-                setFooterInfoTodos(item.footer);
-                setSaida(null);
-              } else {
-                setSaida(item.content);
-                setFooterInfo(item.footer);
-                setPesquisaEspecializada(
-                  (item.support ?? []).map((s) => ({
-                    agentId: s.label,
-                    agentName: s.label,
-                    label: s.label,
-                    icone: s.icone ?? "🔍",
-                    content: s.content,
-                  }))
-                );
-                setResultadosTodos(null);
-              }
-            }}
-          />
-          <button type="button" className="sgf-bible-open" onClick={() => setBibleOpen(true)}>
-            {BIBLE_NAME}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="sgf-bible-open"
+          onClick={() => setBibleOpen(true)}
+        >
+          {BIBLE_NAME}
+        </button>
       </header>
+
+      <SavedLibraryPanel
+        items={libraryItems}
+        activeId={currentLibraryId}
+        onOpen={handleAbrirGuardado}
+        onDelete={handleExcluirGuardado}
+      />
 
       <form className="sgf-form" onSubmit={handleGerar}>
 
@@ -821,16 +917,9 @@ export function SermonGeneratorForm() {
                 type="checkbox"
                 checked={usarPassagem}
                 onChange={(e) => {
-                  setUsarPassagem(e.target.checked);
-                  if (!e.target.checked) {
-                    setLivro("");
-                    setCapitulo("");
-                    setVersiculos("");
-                  } else {
-                    setLivro("João");
-                    setCapitulo("1");
-                    setVersiculos("");
-                  }
+                  const on = e.target.checked;
+                  setUsarPassagem(on);
+                  setPassagens(on ? [newPassageRow("João", "1", "")] : []);
                 }}
               />
               <span className="sgf-toggle-track" />
@@ -841,103 +930,87 @@ export function SermonGeneratorForm() {
           </div>
 
           {usarPassagem && (
-            <div className="sgf-grid-3">
-              <label className="sgf-field sgf-col-2">
-                <span>Livro</span>
-                <select value={livro} onChange={(e) => setLivro(e.target.value)}>
-                  {BIBLE_BOOKS_PT.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="sgf-field">
-                <span>Capítulo</span>
-                <input
-                  type="number" min={1} max={150}
-                  value={capitulo}
-                  onChange={(e) => setCapitulo(e.target.value)}
-                />
-              </label>
-              <label className="sgf-field sgf-col-full">
-                <span>Versículos <em>(opcional, ex.: 1-8 ou 5)</em></span>
-                <input
-                  type="text"
-                  placeholder="ex.: 1-8"
-                  value={versiculos}
-                  onChange={(e) => setVersiculos(e.target.value)}
-                />
-              </label>
-            </div>
-          )}
-
-          {usarPassagem && (
             <>
-              {/* Segunda passagem */}
-              <div className="sgf-segunda-passagem-toggle">
-                <button
-                  type="button"
-                  className={`sgf-segunda-btn${usarSegundaPassagem ? " is-active" : ""}`}
-                  onClick={() => {
-                    setUsarSegundaPassagem(!usarSegundaPassagem);
-                    if (usarSegundaPassagem) {
-                      setLivro2("");
-                      setCapitulo2("");
-                      setVersiculos2("");
-                    } else {
-                      setLivro2("Romanos");
-                      setCapitulo2("8");
-                      setVersiculos2("");
-                    }
-                  }}
-                >
-                  {usarSegundaPassagem ? "− Remover segunda passagem" : "+ Adicionar segunda passagem"}
-                </button>
+              <div className="sgf-passagem-list">
+                {passagens.map((row, index) => (
+                  <div key={row.id} className="sgf-passagem-row">
+                    <div className="sgf-passagem-row-head">
+                      <span className="sgf-passagem-row-label">
+                        {index === 0 ? "1º livro — eixo da mensagem" : `${index + 1}º livro`}
+                      </span>
+                      {passagens.length > 1 && (
+                        <button
+                          type="button"
+                          className="sgf-passagem-remove"
+                          onClick={() => removePassagem(row.id)}
+                        >
+                          Remover
+                        </button>
+                      )}
+                    </div>
+                    <div className="sgf-grid-3">
+                      <label className="sgf-field sgf-col-2">
+                        <span>Livro</span>
+                        <select
+                          value={row.livro}
+                          onChange={(e) => updatePassagem(row.id, { livro: e.target.value })}
+                        >
+                          <option value="">— escolha o livro —</option>
+                          {BIBLE_BOOKS_PT.map((b) => (
+                            <option key={b} value={b}>{b}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="sgf-field">
+                        <span>Capítulo</span>
+                        <input
+                          type="number" min={1} max={150}
+                          value={row.capitulo}
+                          onChange={(e) => updatePassagem(row.id, { capitulo: e.target.value })}
+                        />
+                      </label>
+                      <label className="sgf-field sgf-col-full">
+                        <span>Versículos <em>(opcional, ex.: 1-8 ou 5)</em></span>
+                        <input
+                          type="text"
+                          placeholder="ex.: 1-8"
+                          value={row.versiculos}
+                          onChange={(e) => updatePassagem(row.id, { versiculos: e.target.value })}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              {usarSegundaPassagem && (
-                <div className="sgf-grid-3 sgf-segunda-passagem">
-                  <label className="sgf-field sgf-col-2">
-                    <span>Livro <em>(2ª passagem)</em></span>
-                    <select value={livro2} onChange={(e) => setLivro2(e.target.value)}>
-                      {BIBLE_BOOKS_PT.map((b) => (
-                        <option key={b} value={b}>{b}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="sgf-field">
-                    <span>Capítulo</span>
-                    <input
-                      type="number" min={1} max={150}
-                      value={capitulo2}
-                      onChange={(e) => setCapitulo2(e.target.value)}
-                    />
-                  </label>
-                  <label className="sgf-field sgf-col-full">
-                    <span>Versículos <em>(opcional)</em></span>
-                    <input
-                      type="text"
-                      placeholder="ex.: 1-8"
-                      value={versiculos2}
-                      onChange={(e) => setVersiculos2(e.target.value)}
-                    />
-                  </label>
+              {passagens.length < MAX_PASSAGENS && (
+                <div className="sgf-segunda-passagem-toggle">
+                  <button
+                    type="button"
+                    className="sgf-segunda-btn"
+                    onClick={addPassagem}
+                  >
+                    + Adicionar outro livro
+                  </button>
                 </div>
               )}
 
-              <div className="sgf-passagem-badge-row">
-                {textoBasePreview && (
-                  <div className="sgf-passagem-badge">
-                    <span className="sgf-passagem-badge-icon">📖</span>
-                    <strong>{textoBasePreview}</strong>
-                  </div>
-                )}
-                {usarSegundaPassagem && textoBase2Preview && (
-                  <div className="sgf-passagem-badge sgf-passagem-badge--2">
-                    <span className="sgf-passagem-badge-icon">📖</span>
-                    <strong>{textoBase2Preview}</strong>
-                  </div>
-                )}
-              </div>
+              {textosBasePreview.length > 0 && (
+                <div className="sgf-passagem-badge-row">
+                  {textosBasePreview.map((ref, i) => (
+                    <div
+                      key={`${ref}-${i}`}
+                      className={`sgf-passagem-badge${i === 0 ? "" : " sgf-passagem-badge--2"}`}
+                    >
+                      <span className="sgf-passagem-badge-icon">📖</span>
+                      <strong>{ref}</strong>
+                      {i === 0 && textosBasePreview.length > 1 && (
+                        <em className="sgf-passagem-eixo">eixo</em>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           )}
 
@@ -1090,7 +1163,7 @@ export function SermonGeneratorForm() {
 
         {/* ── Botões ── */}
         <div className="sgf-actions">
-          <button type="submit" className="sgf-submit" disabled={loading || loadingTodos || loadingEspecialistas || (!textoBasePreview && !tema.trim())}>
+          <button type="submit" className="sgf-submit" disabled={loading || loadingTodos || loadingEspecialistas || (!textosBasePreview.length && !tema.trim())}>
             {loading ? (
               <span className="sgf-submit-loading">
                 <span className="sgf-spinner" />
@@ -1103,7 +1176,7 @@ export function SermonGeneratorForm() {
           <button
             type="button"
             className="sgf-submit sgf-submit-all"
-            disabled={loading || loadingTodos || loadingEspecialistas || (!textoBasePreview && !tema.trim())}
+            disabled={loading || loadingTodos || loadingEspecialistas || (!textosBasePreview.length && !tema.trim())}
             onClick={handleGerarTodos}
           >
             {loadingTodos ? (
@@ -1131,8 +1204,8 @@ export function SermonGeneratorForm() {
           <div className="sgf-output-header">
             <div className="sgf-output-meta">
               <span className="sgf-output-tag">{tipoLabel}</span>
-              {(textoBasePreview || tema.trim()) && (
-                <span className="sgf-output-ref">{textoBasePreview || tema.trim()}</span>
+              {(passagensLabel || tema.trim()) && (
+                <span className="sgf-output-ref">{passagensLabel || tema.trim()}</span>
               )}
             </div>
             <div className="sgf-output-actions">
@@ -1144,8 +1217,22 @@ export function SermonGeneratorForm() {
               >
                 {copied ? "✓ Copiado" : "Copiar"}
               </button>
-              <button type="button" className="sgf-action-btn" onClick={handleSalvarUnico} disabled={loading}>
-                {savedFlash ? "✓ Guardado" : "Salvar"}
+              <button
+                type="button"
+                className="sgf-action-btn"
+                onClick={handlePrint}
+                title="Imprimir ou salvar em PDF"
+              >
+                Imprimir / PDF
+              </button>
+              <button
+                type="button"
+                className={`sgf-action-btn${jaGuardado ? " is-copied" : ""}`}
+                onClick={handleSalvarAtual}
+                disabled={jaGuardado || loading || loadingEspecialistas}
+                title="Guardar neste navegador"
+              >
+                {jaGuardado ? "✓ Guardado" : "Salvar"}
               </button>
               <button
                 type="button"
@@ -1225,9 +1312,9 @@ export function SermonGeneratorForm() {
             apoio={pesquisaTodos}
             footerInfo={footerInfoTodos}
             onNovo={handleNovo}
+            onSave={handleSalvarAtual}
+            jaGuardado={jaGuardado}
             onBibleRef={setBibleRef}
-            onSave={handleSalvarTodos}
-            savedFlash={savedFlash}
           />
         </div>
       )}
@@ -1246,6 +1333,7 @@ export function SermonGeneratorForm() {
       )}
       {bibleOpen && (
         <BibleReader
+          key={`${readerLoc.bookId}-${readerLoc.chapter}`}
           initialBookId={readerLoc.bookId}
           initialChapter={readerLoc.chapter}
           onClose={() => setBibleOpen(false)}

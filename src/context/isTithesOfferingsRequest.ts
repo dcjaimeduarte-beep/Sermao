@@ -1,4 +1,5 @@
 import type { UserRequest } from "@/domain";
+import { passagensDoPedido } from "./passagensDoPedido";
 
 const KEYWORDS = [
   "dizim",
@@ -33,7 +34,7 @@ export function isTithesOfferingsRequest(request: UserRequest): boolean {
   if (request.incluirMordomia) return true;
 
   const blob = normalize(
-    [request.tema, request.textoBase, request.textoBase2, request.contextoGeracao]
+    [request.tema, ...passagensDoPedido(request), request.contextoGeracao]
       .filter(Boolean)
       .join(" ")
   );
