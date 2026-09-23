@@ -2,8 +2,9 @@ Options -MultiViews
 RewriteEngine On
 
 # ── Proxy de API (encaminha chamadas do app para o PHP seguro) ──
-# Captura /proxy/v1/* e envia para proxy/openai.php
-RewriteRule ^proxy/v1/.*$ /proxy/openai.php [QSA,L]
+# Caminho relativo + END: um destino com barra inicial (/proxy/openai.php)
+# vira redirect interno e o Apache descarta o corpo do POST (400 Requisição vazia).
+RewriteRule ^proxy/v1/.*$ proxy/openai.php [QSA,END]
 
 # ── SPA — todas as rotas vão para o index.html ──
 RewriteCond %{REQUEST_FILENAME} !-f

@@ -14,7 +14,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 ## Estado atual
 
-**Última atualização:** 2026-08-26
+**Última atualização:** 2026-09-23
 
 **Onde estamos**
 
@@ -43,6 +43,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 **Deploy**
 - Pasta pronta: **`sermao-deploy/`** — subir `index.html` + `assets/` + pasta **`bible/`**. Não reenviar `proxy/openai.php`.
+- **400 Requisição vazia:** resolvido em 2026-09-23 no ar. O PHP do plano descarta POST acima de ~16 KB; o app compacta o pedido (gzip) e `proxy/openai.php` descompacta. Confirmado pelo usuário após subir `proxy/openai.php`, `index.html` e `assets/index-ClPN3bOA.js`.
 
 **Dízimos, ofertas, primícias**
 - Não é concórdia de Malaquias 3. O exegeta abstrai de toda a Bíblia a *forma do ato*: dizimar / ofertar / primiciar (incluindo textos onde o ato está e a palavra “dízimo” não está).

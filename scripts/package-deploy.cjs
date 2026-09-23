@@ -85,6 +85,16 @@ execSync("npm run build:web", { cwd: ROOT, stdio: "inherit" });
 log("Copiando .htaccess…");
 copyFile(path.join(DEPLOY_ASSETS, ".htaccess"), path.join(DIST, ".htaccess"));
 
+const userIni = path.join(DEPLOY_ASSETS, ".user.ini");
+if (fs.existsSync(userIni)) {
+  log("Copiando .user.ini (post_max_size)…");
+  copyFile(userIni, path.join(DIST, ".user.ini"));
+}
+const proxyIni = path.join(ROOT, "proxy", ".user.ini");
+if (fs.existsSync(proxyIni)) {
+  copyFile(proxyIni, path.join(DIST, "proxy", ".user.ini"));
+}
+
 log("Copiando LEIA-ME.txt…");
 copyFile(path.join(DEPLOY_ASSETS, "LEIA-ME.txt"), path.join(DIST, "LEIA-ME.txt"));
 

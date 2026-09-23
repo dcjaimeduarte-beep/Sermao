@@ -350,3 +350,16 @@ O `aiRouter.ts` chama a API Claude com streaming.
 - Adicionar modo de impressão / exportar para PDF
 - Adicionar histórico de sermões gerados (localStorage)
 
+---
+
+### 2026-09-23 — Sessão 11: 400 Requisição vazia no site publicado
+
+**O que foi feito:**
+- O PHP da hospedagem descarta POST acima de ~16 KB; o esboço passava disso e o proxy respondia "Requisição vazia"
+- Em produção o app compacta o JSON (gzip) e, se ainda não couber, envia em partes
+- `proxy/openai.php` descompacta e remonta o pedido antes de chamar a OpenAI
+- Vite de desenvolvimento escuta em `127.0.0.1:5173` (o navegador não alcançava o IPv6)
+- Confirmado no ar depois de subir `proxy/openai.php`, `index.html` e `assets/index-ClPN3bOA.js`
+
+**Estado atual:** Geração no site publicado funcionando. Localhost segue chamando a OpenAI direto.
+

@@ -18,6 +18,12 @@ function omitUnusedBibleOriginal() {
 
 export default defineConfig({
   plugins: [react(), omitUnusedBibleOriginal()],
+  server: {
+    // No Windows, "localhost" no Node cai em ::1 e o navegador tenta 127.0.0.1.
+    host: "127.0.0.1",
+    port: 5173,
+    strictPort: true,
+  },
   build: {
     outDir: "dist-web",
   },

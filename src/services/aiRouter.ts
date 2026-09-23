@@ -55,22 +55,79 @@ Depois: lições, perguntas do encontro, oração em 4 movimentos, declaração,
 Frases curtas. Citações em bloco (>).`,
 };
 
+/** O PHP deste plano descarta POST maior que ~16 KB. Abaixo disso o JSON vai inteiro. */
+const PROXY_SAFE_BYTES = 12_000;
+
+async function gzipUtf8(text: string): Promise<Uint8Array | null> {
+  const Ctor = (globalThis as { CompressionStream?: typeof CompressionStream }).CompressionStream;
+  if (!Ctor) return null;
+  const stream = new Blob([text]).stream().pipeThrough(new Ctor("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function postInChunks(url: string, text: string, signal?: AbortSignal): Promise<Response> {
+  const id = `${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`.slice(0, 16);
+  const size = 3000;
+  const parts: string[] = [];
+  for (let i = 0; i < text.length; i += size) parts.push(text.slice(i, i + size));
+
+  for (let i = 0; i < parts.length; i++) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ _chunk: { id, i, n: parts.length, data: parts[i] } }),
+      signal,
+    });
+    if (!res.ok) return res;
+    await res.text();
+  }
+
+  return fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ _chunk: { id, finish: true, n: parts.length } }),
+    signal,
+  });
+}
+
 /**
  * Em desenvolvimento (npm run dev:web): usa a API da OpenAI diretamente
  * com a chave do arquivo .env (VITE_OPENAI_API_KEY).
  *
- * Em produção (build publicado): usa o proxy PHP do servidor
- * (/proxy/v1) — a chave fica segura no servidor, nunca exposta no JS.
+ * Em produção (build publicado): usa o proxy PHP do servidor.
+ * A chave fica no servidor, nunca exposta no JS.
+ * Pedidos grandes vão compactados: o plano corta POST acima de ~16 KB.
  */
 function createClient(): OpenAI {
   if (import.meta.env.PROD) {
-    // Produção: chama o proxy PHP — chave configurada em proxy/openai.php
-    // Usa URL absoluta (obrigatório pelo SDK da OpenAI)
-    const proxyBase = `${window.location.origin}/proxy/v1`;
+    const proxyUrl = new URL("/proxy/openai.php", window.location.origin).toString();
     return new OpenAI({
       apiKey: "proxy", // valor ignorado — autenticação acontece no PHP
-      baseURL: proxyBase,
+      baseURL: `${window.location.origin}/proxy/v1`,
       dangerouslyAllowBrowser: true,
+      fetch: async (input, init) => {
+        const source = input instanceof Request ? input : null;
+        const method = (init?.method ?? source?.method ?? "POST").toUpperCase();
+        let text = "";
+        if (typeof init?.body === "string") text = init.body;
+        else if (init?.body instanceof Uint8Array) text = new TextDecoder().decode(init.body);
+        else if (source) text = await source.clone().text();
+
+        const signal = init?.signal ?? source?.signal;
+        if (method !== "POST" || text.length <= PROXY_SAFE_BYTES) {
+          return fetch(proxyUrl, { method, headers: init?.headers ?? source?.headers, body: text || undefined, signal });
+        }
+
+        const packed = await gzipUtf8(text);
+        if (packed && packed.byteLength <= PROXY_SAFE_BYTES) {
+          const headers = new Headers(init?.headers ?? source?.headers);
+          headers.delete("content-length");
+          headers.set("content-type", "application/octet-stream");
+          return fetch(proxyUrl, { method: "POST", headers, body: packed, signal });
+        }
+
+        return postInChunks(proxyUrl, text, signal);
+      },
     });
   }
 

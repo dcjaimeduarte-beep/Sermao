@@ -1,48 +1,48 @@
 <?php
 // ================================================================
-//  GERADOR DE CONTEÚDO BÍBLICO — Proxy Seguro para OpenAI
+//  GERADOR DE CONTEÃšDO BÃBLICO â€” Proxy Seguro para OpenAI
 // ================================================================
 //
 //  1. Substitua SUA_CHAVE_AQUI pela sua chave real (sk-proj-...)
-//  2. Ajuste ALLOWED_ORIGINS com os domínios do seu site
+//  2. Ajuste ALLOWED_ORIGINS com os domÃ­nios do seu site
 //  3. Salve como proxy/openai.php no servidor
 //
 // ================================================================
 
 define('OPENAI_API_KEY', 'sk-proj-SUA_CHAVE_AQUI');
 
-// Domínios autorizados (sem barra final). Ajuste conforme seu domínio.
+// DomÃ­nios autorizados (sem barra final). Ajuste conforme seu domÃ­nio.
 define('ALLOWED_ORIGINS', implode(',', [
     'http://sermao.jdafotografia.com.br',
     'https://sermao.jdafotografia.com.br',
     // 'http://localhost:5173',   // descomente apenas em testes locais
 ]));
 
-// Segurança: limite máximo de tokens por requisição (previne gastos excessivos)
+// SeguranÃ§a: limite mÃ¡ximo de tokens por requisiÃ§Ã£o (previne gastos excessivos)
 define('MAX_TOKENS_CAP', 8000);
 
-// Rate limit: máximo de requisições por IP por janela de tempo
-define('RATE_LIMIT_MAX',    20);   // requisições permitidas
+// Rate limit: mÃ¡ximo de requisiÃ§Ãµes por IP por janela de tempo
+define('RATE_LIMIT_MAX',    80);   // requisiÃ§Ãµes permitidas
 define('RATE_LIMIT_WINDOW', 300);  // janela em segundos (5 minutos)
 
 // ================================================================
-//  NÃO EDITAR ABAIXO DESTA LINHA
+//  NÃƒO EDITAR ABAIXO DESTA LINHA
 // ================================================================
 
-// ── 1. Verificação da chave ────────────────────────────────────
+// â”€â”€ 1. VerificaÃ§Ã£o da chave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (OPENAI_API_KEY === 'sk-proj-SUA_CHAVE_AQUI' || empty(OPENAI_API_KEY)) {
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode([
         'error' => [
-            'message' => 'Chave da OpenAI não configurada. Edite proxy/openai.php.',
+            'message' => 'Chave da OpenAI nÃ£o configurada. Edite proxy/openai.php.',
             'type'    => 'configuration_error',
         ]
     ]);
     exit();
 }
 
-// ── 2. CORS — verifica origem ─────────────────────────────────
+// â”€â”€ 2. CORS â€” verifica origem â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $allowedOrigins = array_map('trim', explode(',', ALLOWED_ORIGINS));
 $origin         = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 $corsOrigin     = !empty($origin) ? $origin : $allowedOrigins[0];
@@ -50,11 +50,11 @@ $corsOrigin     = !empty($origin) ? $origin : $allowedOrigins[0];
 if (!empty($origin) && !in_array($origin, $allowedOrigins, true)) {
     http_response_code(403);
     header('Content-Type: application/json');
-    echo json_encode(['error' => ['message' => 'Origem não autorizada.', 'type' => 'forbidden']]);
+    echo json_encode(['error' => ['message' => 'Origem nÃ£o autorizada.', 'type' => 'forbidden']]);
     exit();
 }
 
-// Pré-flight CORS (responde antes dos headers SSE)
+// PrÃ©-flight CORS (responde antes dos outros headers SSE)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     header('Access-Control-Allow-Origin: ' . $corsOrigin);
@@ -64,15 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// ── 3. Apenas POST ─────────────────────────────────────────────
+// â”€â”€ 3. Apenas POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     header('Content-Type: application/json');
-    echo json_encode(['error' => ['message' => 'Método não permitido.']]);
+    echo json_encode(['error' => ['message' => 'MÃ©todo nÃ£o permitido.']]);
     exit();
 }
 
-// ── 4. Rate limiting por IP (compatível com PHP 7.0+) ──────────
+// â”€â”€ 4. Rate limiting por IP (compatÃ­vel com PHP 7.0+) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ip      = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
 $ipHash  = md5($ip);
 $tmpFile = sys_get_temp_dir() . '/sermao_rl_' . $ipHash . '.json';
@@ -85,7 +85,7 @@ if (file_exists($tmpFile)) {
     if (is_array($decoded)) $rl = $decoded;
 }
 
-// Remove registros fora da janela (sem arrow function — compatível PHP 7.0+)
+// Remove registros fora da janela (sem arrow function â€” compatÃ­vel PHP 7.0+)
 $filtered = array();
 foreach ($rl['requests'] as $t) {
     if ($t > $window) $filtered[] = $t;
@@ -97,7 +97,7 @@ if (count($rl['requests']) >= RATE_LIMIT_MAX) {
     header('Content-Type: application/json');
     echo json_encode([
         'error' => [
-            'message' => 'Muitas requisições. Aguarde alguns minutos e tente novamente.',
+            'message' => 'Muitas requisiÃ§Ãµes. Aguarde alguns minutos e tente novamente.',
             'type'    => 'rate_limit_exceeded',
         ]
     ]);
@@ -107,49 +107,115 @@ if (count($rl['requests']) >= RATE_LIMIT_MAX) {
 $rl['requests'][] = $now;
 @file_put_contents($tmpFile, json_encode($rl), LOCK_EX);
 
-// ── 5. Validação e saneamento do body ─────────────────────────
+// â”€â”€ 5. ValidaÃ§Ã£o e saneamento do body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Este plano descarta POST acima de ~16 KB. O app manda o JSON compactado
+// (gzip) ou em partes pequenas, para o corpo caber nesse limite.
 $rawBody = file_get_contents('php://input');
+if (!is_string($rawBody)) $rawBody = '';
 
-if (empty($rawBody)) {
+if (strlen($rawBody) >= 2 && substr($rawBody, 0, 2) === "\x1f\x8b") {
+    $decoded = @gzdecode($rawBody);
+    if (!is_string($decoded) || $decoded === '' || strlen($decoded) > 1500000) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => ['message' => 'NÃ£o foi possÃ­vel ler o pedido compactado.']]);
+        exit();
+    }
+    $rawBody = $decoded;
+}
+
+if ($rawBody === '') {
     http_response_code(400);
     header('Content-Type: application/json');
-    echo json_encode(['error' => ['message' => 'Requisição vazia.']]);
+    echo json_encode(['error' => ['message' => 'RequisiÃ§Ã£o vazia.']]);
     exit();
 }
 
 $payload = json_decode($rawBody, true);
 
+if (is_array($payload) && isset($payload['_chunk']) && is_array($payload['_chunk'])) {
+    $chunk = $payload['_chunk'];
+    $id = isset($chunk['id']) ? preg_replace('/[^a-f0-9]/', '', (string) $chunk['id']) : '';
+    if (!is_string($id) || strlen($id) < 8) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => ['message' => 'Parte do pedido invÃ¡lida.']]);
+        exit();
+    }
+    $base = sys_get_temp_dir() . '/sermao_chk_' . $id;
+    $total = isset($chunk['n']) ? (int) $chunk['n'] : 0;
+    if (!empty($chunk['finish'])) {
+        if ($total < 1 || $total > 40) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => ['message' => 'Pedido incompleto.']]);
+            exit();
+        }
+        $rawBody = '';
+        for ($i = 0; $i < $total; $i++) {
+            $partFile = $base . '_' . $i;
+            $part = @file_get_contents($partFile);
+            @unlink($partFile);
+            if (!is_string($part) || $part === '') {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => ['message' => 'Faltou uma parte do pedido.']]);
+                exit();
+            }
+            $rawBody .= $part;
+        }
+        $payload = json_decode($rawBody, true);
+    } else {
+        $index = isset($chunk['i']) ? (int) $chunk['i'] : -1;
+        $data = isset($chunk['data']) ? (string) $chunk['data'] : '';
+        if ($index < 0 || $index > 39 || $total < 1 || $total > 40 || $data === '') {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => ['message' => 'Parte do pedido invÃ¡lida.']]);
+            exit();
+        }
+        @file_put_contents($base . '_' . $index, $data, LOCK_EX);
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => true]);
+        exit();
+    }
+}
+
 if (!is_array($payload) || !isset($payload['messages']) || !is_array($payload['messages'])) {
     http_response_code(400);
     header('Content-Type: application/json');
-    echo json_encode(['error' => ['message' => 'Formato de requisição inválido.']]);
+    echo json_encode(['error' => ['message' => 'Formato de requisiÃ§Ã£o invÃ¡lido.']]);
     exit();
 }
 
-// Forçar modelo permitido e limitar tokens (impede abusos de custo)
+// ForÃ§ar modelo permitido e limitar tokens (impede abusos de custo)
 $payload['model']      = 'gpt-4o';
 $payload['max_tokens'] = min((int)(isset($payload['max_tokens']) ? $payload['max_tokens'] : MAX_TOKENS_CAP), MAX_TOKENS_CAP);
 
-// Limitar número de mensagens
+// Limitar nÃºmero de mensagens
 if (count($payload['messages']) > 10) {
     http_response_code(400);
     header('Content-Type: application/json');
-    echo json_encode(['error' => ['message' => 'Número de mensagens excede o limite.']]);
+    echo json_encode(['error' => ['message' => 'NÃºmero de mensagens excede o limite.']]);
     exit();
 }
 
-$safeBody = json_encode($payload);
+$isStreaming = !empty($payload['stream']) && $payload['stream'] === true;
+$safeBody    = json_encode($payload);
 
-// ── 6. Headers SSE — apenas aqui, após todas as validações ─────
-header('Content-Type: text/event-stream');
-header('Cache-Control: no-cache');
-header('X-Accel-Buffering: no');
+// â”€â”€ 6. Headers â€” SSE para streaming, JSON para respostas normais â”€
 header('Access-Control-Allow-Origin: ' . $corsOrigin);
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Vary: Origin');
 
-// ── 7. Encaminha para a OpenAI com streaming ───────────────────
+if ($isStreaming) {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('X-Accel-Buffering: no');
+}
+
+// â”€â”€ 7. Encaminha para a OpenAI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ch = curl_init('https://api.openai.com/v1/chat/completions');
 
 curl_setopt($ch, CURLOPT_POST,           true);
@@ -158,19 +224,30 @@ curl_setopt($ch, CURLOPT_HTTPHEADER,     [
     'Content-Type: application/json',
     'Authorization: Bearer ' . OPENAI_API_KEY,
 ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_TIMEOUT,        120);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
-curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $data) {
-    echo $data;
-    if (ob_get_level() > 0) ob_flush();
-    flush();
-    return strlen($data);
-});
-
-$success = curl_exec($ch);
+if ($isStreaming) {
+    // Streaming: ecoa os chunks SSE em tempo real
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+    curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $data) {
+        echo $data;
+        if (ob_get_level() > 0) ob_flush();
+        flush();
+        return strlen($data);
+    });
+    $success = curl_exec($ch);
+} else {
+    // NÃ£o-streaming: acumula e devolve JSON
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $responseBody = curl_exec($ch);
+    $success      = $responseBody !== false;
+    if ($success) {
+        header('Content-Type: application/json');
+        echo $responseBody;
+    }
+}
 
 if (!$success) {
     http_response_code(502);
