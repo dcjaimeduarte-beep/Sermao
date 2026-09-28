@@ -1,3 +1,5 @@
+import type { ContentType, GeneratedContent } from "./biblicalTypes";
+
 export interface FooterInfo {
   passagem: string;
   tipo: string;
@@ -9,14 +11,26 @@ export interface FooterInfo {
   data: string;
 }
 
+export interface SavedSupportNote {
+  agentId: string;
+  agentName: string;
+  content: string;
+  label: string;
+  icone: string;
+}
+
 export interface SavedLibraryItem {
   id: string;
   savedAt: number;
-  kind: "unico" | "tres";
-  tipoLabel: string;
+  kind: ContentType | "todos";
   title: string;
-  content: string;
-  allContents?: Array<{ label: string; content: string }>;
-  footer: FooterInfo;
-  support?: Array<{ label: string; icone?: string; content: string }>;
+  passagem: string;
+  tipoLabel: string;
+  footerInfo: FooterInfo;
+  content?: string;
+  pesquisa?: SavedSupportNote[];
+  resultadosTodos?: GeneratedContent[];
+  pesquisaTodos?: SavedSupportNote[];
 }
+
+export type NewSavedLibraryItem = Omit<SavedLibraryItem, "id" | "savedAt">;
