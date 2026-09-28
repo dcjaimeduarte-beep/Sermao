@@ -14,7 +14,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 ## Estado atual
 
-**Última atualização:** 2026-09-23
+**Última atualização:** 2026-09-28
 
 **Onde estamos**
 
@@ -37,6 +37,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - Sem ilustração. Com passagem: versículo a versículo. Sem passagem: 4 a 6 versículos principais.
 
 **UI**
+- Passagem bíblica: **Remover** vale também para um único livro (limpa livro, capítulo e versículo). O selo da referência tem o mesmo ×. Capítulo é texto numérico, para dar para apagar.
 - Fundação Exegética e Teológica é **aba**.
 - **Guardados** neste navegador (localStorage).
 - **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o significado.

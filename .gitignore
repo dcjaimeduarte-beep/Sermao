@@ -26,3 +26,6 @@ public/bible/_nt.json
 proxy/openai.php
 sermao-deploy/proxy/openai.php
 **/openai.php
+
+# Backup local das chaves — nunca commitar
+backup-chaves/

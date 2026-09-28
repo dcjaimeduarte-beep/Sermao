@@ -56,6 +56,14 @@ function buildTextoBase(livro: string, capitulo: string, versiculos: string): st
   return ver ? `${livro} ${cap}:${ver}` : `${livro} ${cap}`;
 }
 
+function normalizeCapitulo(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 3);
+  if (!digits) return "";
+  const n = Number(digits);
+  if (n > 150) return "150";
+  return String(n);
+}
+
 const MAX_PASSAGENS = 6;
 
 type PassageRow = {
@@ -585,7 +593,10 @@ export function SermonGeneratorForm() {
   }
 
   function removePassagem(id: string) {
-    setPassagens((rows) => (rows.length <= 1 ? rows : rows.filter((row) => row.id !== id)));
+    setPassagens((rows) => {
+      const next = rows.filter((row) => row.id !== id);
+      return next.length ? next : [newPassageRow()];
+    });
   }
 
   function addPassagem() {
@@ -938,11 +949,16 @@ export function SermonGeneratorForm() {
                       <span className="sgf-passagem-row-label">
                         {index === 0 ? "1º livro — eixo da mensagem" : `${index + 1}º livro`}
                       </span>
-                      {passagens.length > 1 && (
+                      {(passagens.length > 1 || row.livro || row.capitulo || row.versiculos) && (
                         <button
                           type="button"
                           className="sgf-passagem-remove"
                           onClick={() => removePassagem(row.id)}
+                          aria-label={
+                            passagens.length > 1
+                              ? `Remover ${index + 1}º livro`
+                              : "Limpar esta passagem"
+                          }
                         >
                           Remover
                         </button>
@@ -964,9 +980,12 @@ export function SermonGeneratorForm() {
                       <label className="sgf-field">
                         <span>Capítulo</span>
                         <input
-                          type="number" min={1} max={150}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="off"
+                          placeholder="ex.: 3"
                           value={row.capitulo}
-                          onChange={(e) => updatePassagem(row.id, { capitulo: e.target.value })}
+                          onChange={(e) => updatePassagem(row.id, { capitulo: normalizeCapitulo(e.target.value) })}
                         />
                       </label>
                       <label className="sgf-field sgf-col-full">
@@ -997,18 +1016,29 @@ export function SermonGeneratorForm() {
 
               {textosBasePreview.length > 0 && (
                 <div className="sgf-passagem-badge-row">
-                  {textosBasePreview.map((ref, i) => (
-                    <div
-                      key={`${ref}-${i}`}
-                      className={`sgf-passagem-badge${i === 0 ? "" : " sgf-passagem-badge--2"}`}
-                    >
-                      <span className="sgf-passagem-badge-icon">📖</span>
-                      <strong>{ref}</strong>
-                      {i === 0 && textosBasePreview.length > 1 && (
-                        <em className="sgf-passagem-eixo">eixo</em>
-                      )}
-                    </div>
-                  ))}
+                  {passagens
+                    .map((row) => ({ id: row.id, ref: buildTextoBase(row.livro, row.capitulo, row.versiculos) }))
+                    .filter((row) => row.ref)
+                    .map((row, i, list) => (
+                      <div
+                        key={row.id}
+                        className={`sgf-passagem-badge${i === 0 ? "" : " sgf-passagem-badge--2"}`}
+                      >
+                        <span className="sgf-passagem-badge-icon">📖</span>
+                        <strong>{row.ref}</strong>
+                        {i === 0 && list.length > 1 && (
+                          <em className="sgf-passagem-eixo">eixo</em>
+                        )}
+                        <button
+                          type="button"
+                          className="sgf-passagem-badge-remove"
+                          onClick={() => removePassagem(row.id)}
+                          aria-label={`Remover ${row.ref}`}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                 </div>
               )}
             </>

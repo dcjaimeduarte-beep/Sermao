@@ -412,6 +412,24 @@ body { margin: 0; min-height: 100vh; }
   width: fit-content;
 }
 .sgf-passagem-badge-icon { font-size: .95rem; }
+.sgf-passagem-badge-remove {
+  font: inherit;
+  font-size: .95rem;
+  line-height: 1;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-left: .1rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+}
+.sgf-passagem-badge-remove:hover {
+  background: var(--red-bg);
+  color: var(--red-text);
+}
 
 /* Duration slider */
 .sgf-duration-wrap {
