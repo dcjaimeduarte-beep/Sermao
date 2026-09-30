@@ -14,7 +14,7 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 ## Estado atual
 
-**Última atualização:** 2026-09-28
+**Última atualização:** 2026-09-30
 
 **Onde estamos**
 
@@ -35,6 +35,8 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 
 **Sermão**
 - Sem ilustração. Com passagem: versículo a versículo. Sem passagem: 4 a 6 versículos principais.
+- Sermão, esboço, estudo e fundação usam o mesmo bloco rico: texto ARA, tradução/original, contexto, teologia e aplicação.
+- Com o campo preenchido, o pedido puxa verbetes que casam em `docs/dicionario-biblico.md`, `docs/enciclopedia-biblica.md` e `docs/dizimos-ofertas-referencia.md`. Os PDFs da pasta (Matthew Henry, Wycliffe, personagens) não entram no pedido: são grandes demais para o navegador.
 
 **UI**
 - Passagem bíblica: **Remover** vale também para um único livro (limpa livro, capítulo e versículo). O selo da referência tem o mesmo ×. Capítulo é texto numérico, para dar para apagar.
@@ -43,12 +45,12 @@ Este ficheiro é o **ponto único de retoma**: quem trabalhar no repositório (h
 - **Bíblia do Pb Jaime:** RA + NVI offline; clique na referência; selecione palavra para o significado.
 
 **Deploy**
-- Pasta pronta: **`sermao-deploy/`** — subir `index.html` + `assets/` + pasta **`bible/`**. Não reenviar `proxy/openai.php`.
+- Pasta pronta para substituir no ar: **`sermao-deploy/`** (2026-09-30). Mandar a pasta inteira por cima de `public_html/sermao-deploy`. O zip fica só na raiz do projeto e não entra nessa pasta.
 - **400 Requisição vazia:** resolvido em 2026-09-23 no ar. O PHP do plano descarta POST acima de ~16 KB; o app compacta o pedido (gzip) e `proxy/openai.php` descompacta. Confirmado pelo usuário após subir `proxy/openai.php`, `index.html` e `assets/index-ClPN3bOA.js`.
 
 **Dízimos, ofertas, primícias**
 - Não é concórdia de Malaquias 3. O exegeta abstrai de toda a Bíblia a *forma do ato*: dizimar / ofertar / primiciar (incluindo textos onde o ato está e a palavra “dízimo” não está).
-- Liga sozinho se o tema/passagem falar disso (`isTithesOfferingsRequest`) ou se o checkbox de mordomia estiver marcado.
+- Só entra se o campo **Dizimar, ofertar e primiciar** estiver marcado. Tema, passagem ou contexto pastoral não ligam essa lente sozinhos.
 
 **Imprimir / PDF**
 - Botão no resultado (sermão, esboço, estudo ou os 3 tipos). Abre o diálogo do navegador — escolha “Salvar como PDF”.

@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import type { BiblicalAgent, ContentType, GeneratedContent, SupportAgentConfig, UserRequest } from "@/domain";
 import { buildUserContext } from "@/utils/formatOutput";
+import { selectPastoralDocs } from "@/services/pastoralDocs";
 
 /** Mapeia o ID de cada agente principal ao seu tipoConteudo correto */
 const AGENT_TIPO_CONTEUDO: Record<string, ContentType> = {
@@ -12,18 +13,21 @@ const AGENT_TIPO_CONTEUDO: Record<string, ContentType> = {
 /** Instrução final específica por agente — reforça o formato de saída esperado */
 const AGENT_USER_INSTRUCTION: Record<string, string> = {
   "sermon-agent": `
-Gere agora o SERMÃO PREGÁVEL no formato de MANUSCRITO NUMERADO.
-NÃO produza esboço, estudo, molde I/II/III, nem ilustrações.
-Cada movimento do percurso é um BLOCO-TIPO completo:
-- # N. TÍTULO (caixa alta, sem a referência no título)
-- citação em > com a referência
-- 3 a 6 linhas curtas da cena
-- ### Contexto + 2 a 3 textos que iluminam (citações)
-- ### Aplicação pessoal (persona)
+Gere agora o SERMÃO como ESBOÇO RICO DE PÚLPITO.
+Você é o esboçista, o exegeta e o teólogo neste texto. NÃO produza resumo, molde I/II/III, nem ilustrações.
+Cada movimento do percurso é um BLOCO CHEIO, nesta ordem:
+- # N. TÍTULO
+- ### Texto — citação ARA em >
+- ### Tradução — linha mais literal; original (escrita + transliteração + sentido) quando a palavra carregar o ponto
+- 3 a 6 linhas da cena e 3 setas ➡️
+- ### Contexto (4 a 8 linhas)
+- ### Teologia (2 a 4 linhas)
+- 2 a 3 textos que iluminam, com citação
+- ### Aplicação pessoal (persona, o que o texto pede, passo)
 - # PALAVRA PROFÉTICA DESTE BLOCO
-Não entregue bloco raso (só título + 3 linhas + palavra). Expositivo, textual e temático usam o mesmo bloco.
-Cabeçalho + **# 1. INTRODUÇÃO** (o livro + a palavra/tema em menção). Percurso a partir do nº 2. Fecho: contrastes + declaração + frase final.
-Vários livros: uma composição; 1ª = eixo.`,
+Proibido bloco raso. Cabeçalho + **# 1. INTRODUÇÃO**. Percurso a partir do nº 2. Fecho: contrastes + declaração + frase final.
+Vários livros: uma composição; 1ª = eixo.
+Se CONTEXTO PASTORAL estiver preenchido, pregue a CENA do briefing, não a história mais famosa do personagem. Elias sustentado pelo improvável = 1 Reis 17, não o Carmelo. Título e tema repetem as palavras do pastor.`,
 
   "outline-agent": `
 Gere agora o ESBOÇO DE PÚLPITO.
@@ -31,9 +35,10 @@ NÃO produza manuscrito corrido nem estudo de grupo. NÃO use I/II/III.
 TODOS os tipos (expositivo, textual e temático) usam o MESMO BLOCO-TIPO em cada movimento:
 - # N. TÍTULO
 - citação em > (referência)
+- ### Tradução (literal; original se iluminar)
 - linhas curtas da cena
 - 3 setas ➡️
-- ### Contexto + 2 a 3 textos que iluminam
+- ### Contexto + ### Teologia + 2 a 3 textos que iluminam
 - ### Aplicação pessoal (sempre)
 - # PALAVRA PROFÉTICA DESTE BLOCO
 Temático NÃO é raso. Não pule contexto nem textos de fundo.
@@ -42,17 +47,20 @@ Expositivo, textual e temático: a introdução muda o sabor (livro+perícope / 
 Vários livros: uma composição; 1ª = eixo.`,
 
   "study-agent": `
-Gere agora o ESTUDO BÍBLICO PARA GRUPO no mesmo BLOCO-TIPO.
-NÃO produza sermão nem esboço com setas ➡️.
+Gere agora o ESTUDO BÍBLICO PARA GRUPO no MESMO BLOCO RICO do sermão e do esboço.
+NÃO use setas ➡️. NÃO use I/II/III.
 Cada movimento:
-- # N. TÍTULO + Nota para o líder + citação em > + linhas da cena
-- ### Contexto + 2 a 3 textos que iluminam
+- # N. TÍTULO + Nota para o líder
+- ### Texto — citação ARA em >
+- ### Tradução — literal; original se a palavra carregar o ponto
+- linhas da cena
+- ### Contexto + ### Teologia + 2 a 3 textos que iluminam (com citação)
 - ### Aplicação pessoal
-- ### Para o grupo (diagnóstico + desafio) + Dinâmica
+- ### Para o grupo + Dinâmica
 - # PALAVRA PROFÉTICA DESTE BLOCO
 Comece com **# 1. INTRODUÇÃO** (o livro + a palavra/tema em menção + pergunta de abertura). Percurso a partir do nº 2.
 Depois: lições, perguntas do encontro, oração em 4 movimentos, declaração, frase final.
-Frases curtas. Citações em bloco (>).`,
+Proibido bloco raso.`,
 };
 
 /** O PHP deste plano descarta POST maior que ~16 KB. Abaixo disso o JSON vai inteiro. */
@@ -141,6 +149,12 @@ function createClient(): OpenAI {
   return new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
 }
 
+function userContent(request: UserRequest, instruction: string): string {
+  const fontes = selectPastoralDocs(request);
+  const base = buildUserContext(request);
+  return `${base}${fontes ? `\n${fontes}` : ""}\n\n${instruction}`;
+}
+
 /** Executa o agente principal com streaming em tempo real. */
 export async function runAgent(
   agent: BiblicalAgent,
@@ -148,7 +162,6 @@ export async function runAgent(
   onChunk?: (text: string) => void
 ): Promise<GeneratedContent> {
   const client = createClient();
-  const userContext = buildUserContext(request);
   const agentInstruction = AGENT_USER_INSTRUCTION[agent.id]
     ?? "Gere o conteúdo completo agora, com toda a riqueza histórica, literária e aplicação pastoral em linguagem contemporânea.";
 
@@ -159,7 +172,7 @@ export async function runAgent(
       { role: "system", content: agent.promptBase },
       {
         role: "user",
-        content: `${userContext}\n\n${agentInstruction}`,
+        content: userContent(request, agentInstruction),
       },
     ],
     stream: true,
@@ -194,8 +207,6 @@ async function runSupportAgent(
   request: UserRequest,
   client: OpenAI
 ): Promise<GeneratedContent & { label: string; icone: string }> {
-  const userContext = buildUserContext(request);
-
   const response = await client.chat.completions.create({
     model: "gpt-4o",
     max_tokens: 3000,
@@ -203,7 +214,7 @@ async function runSupportAgent(
       { role: "system", content: config.focusPrompt },
       {
         role: "user",
-        content: `${userContext}\n\nProduz a sua contribuição especializada agora, de forma concisa, estruturada e de alto valor ministerial.`,
+        content: userContent(request, "Produz a FUNDAÇÃO agora, no mesmo nível do sermão: em cada seção, texto ARA, tradução ou original, contexto da cena, teologia e aplicação. Não entregue ficha de uma linha."),
       },
     ],
     stream: false,
@@ -251,7 +262,6 @@ export async function runAllMainAgents(
           : undefined,
       };
 
-      const userContext = buildUserContext(agentRequest);
       const agentInstruction = AGENT_USER_INSTRUCTION[agent.id]
         ?? "Gere o conteúdo completo agora, com toda a riqueza histórica, literária e aplicação pastoral em linguagem contemporânea.";
 
@@ -262,7 +272,7 @@ export async function runAllMainAgents(
           { role: "system", content: agent.promptBase },
           {
             role: "user",
-            content: `${userContext}\n\n${agentInstruction}`,
+            content: userContent(agentRequest, agentInstruction),
           },
         ],
         stream: false,

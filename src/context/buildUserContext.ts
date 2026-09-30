@@ -1,6 +1,7 @@
 import type { UserRequest } from "@/domain";
 import { tithesOfferingsContext } from "@/prompts/tithesOfferingsContext";
 import { isTithesOfferingsRequest } from "./isTithesOfferingsRequest";
+import { cenaDoBriefing } from "./pastoralSceneHint";
 import { passagensDoPedido } from "./passagensDoPedido";
 
 const TIPO_SERMAO_DESC: Record<string, string> = {
@@ -18,6 +19,34 @@ const PUBLICO_DESC: Record<string, string> = {
   homens:         "Homens — linguagem direta, desafio à liderança e responsabilidade, aplicações práticas e concretas",
   nao_convertidos:"Não convertidos — linguagem sem jargão religioso, apresente o evangelho com clareza; explique termos teológicos se usá-los; tom acolhedor e sem pressão",
 };
+
+function blocoContextoPastoral(request: UserRequest): string {
+  const texto = request.contextoGeracao?.trim();
+  if (!texto) {
+    return `CONTEXTO PASTORAL: não informado
+→ Sem briefing pastoral. Não invente situação de igreja, série nem objetivo que o pastor não escreveu.`;
+  }
+
+  const paraSermao = request.tipoConteudo === "sermao"
+    ? "→ NO SERMÃO: teça este briefing dentro dos blocos já pedidos (introdução, contexto, textos que iluminam, tradução/original, exegese da cena, aplicação). Não crie seção à parte nem apêndice."
+    : "→ Neste tipo, honre o mesmo briefing dentro do formato pedido, sem trocar o molde.";
+
+  return `CONTEXTO PASTORAL (briefing de enriquecimento — obrigatório):
+${texto}
+→ Este texto é o pedido do pastor sobre a situação da igreja e o que o material precisa carregar. Não é nota de tom.
+→ Responda a ele trazendo, no que o texto pedir:
+1. Contexto histórico-cultural que ilumina essa situação (chão da cena, não ficha de autor/data).
+2. Passagens bíblicas que falem a esse pedido. Com passagem informada, ela continua o eixo; os paralelos são escolhidos por causa desta situação. Sem passagem, tema + briefing escolhem 4 a 6 âncoras (AT e NT). Não invente referência.
+3. Traduções: citação em ARA e, quando a palavra carregar o ponto pastoral, o original (escrita + transliteração + sentido) e o contraste com uma tradução mais literal.
+4. Exegese: o que o texto dizia aos primeiros ouvintes, sem alegoria, ligado ao que esta situação precisa ouvir.
+5. Aplicação: persona e passo concretos para a situação descrita (série, calendário, dor, objetivo).
+→ Se o pastor pediu um acento (consolo, arrependimento, discipulado, evangelismo, mordomia, etc.), esse acento governa a ênfase e a escolha dos paralelos, sem torcer a passagem.
+→ Os checkboxes prevalecem: CONTEXTO HISTÓRICO = NÃO omite ficha histórica; APLICAÇÃO = NÃO omite o bloco de aplicação. O briefing continua orientando passagens, traduções e exegese.
+→ Sem histórias ilustrativas inventadas.
+→ Se aparecer FONTES INTERNAS, esses verbetes de docs/ (dicionário, enciclopédia, dízimos) alimentam o histórico, as passagens, as traduções, a exegese e a aplicação. Não cite o arquivo. Não contradiga o verbete.
+${cenaDoBriefing(request)}
+${paraSermao}`;
+}
 
 const PROFUNDIDADE_DESC: Record<string, string> = {
   simples:  "Simples — linguagem acessível para qualquer crente, sem terminologia técnica, teologia aplicada diretamente sem análise acadêmica; ideal para novos convertidos ou público geral sem formação teológica",
@@ -71,8 +100,7 @@ DURAÇÃO ESTIMADA: ${request.duracaoMinutos} minutos
 ${blocoPassagens}
 TEMA OU TÍTULO SUGERIDO: ${request.tema ?? "não informado"}
 
-CONTEXTO PASTORAL: ${request.contextoGeracao?.trim() ? request.contextoGeracao.trim() : "não informado"}
-→ Se informado, leve em conta a situação da igreja, o tom desejado e os objetivos pastorais ao desenvolver o conteúdo.
+${blocoContextoPastoral(request)}
 
 INCLUIR CONTEXTO HISTÓRICO E LITERÁRIO: ${request.incluirContextoHistorico ? "SIM — desenvolva o contexto histórico, cultural e literário onde for relevante" : "NÃO — omita seções de contexto histórico; foque em exposição e aplicação"}
 
@@ -80,7 +108,7 @@ INCLUIR APLICAÇÃO PRÁTICA: ${request.incluirAplicacao ? "SIM — aplicação 
 
 INCLUIR APELO FINAL: ${request.incluirApeloFinal ? "SIM — inclua um apelo ao final: evangelístico, de renovação ou de consagração, conforme o texto" : "NÃO — encerre sem apelo formal"}
 
-INCLUIR PERSPECTIVA DE MORDOMIA / DÍZIMOS E OFERTAS: ${isTithesOfferingsRequest(request) ? "SIM — o tema, a passagem ou o checkbox pedem esta lente. Siga o bloco TEMA ATIVO abaixo no conteúdo principal (não apenas no especialista)." : "NÃO — não force o tema de dízimos se o pedido for outro"}
+INCLUIR PERSPECTIVA DE MORDOMIA / DÍZIMOS E OFERTAS: ${isTithesOfferingsRequest(request) ? "SIM — o campo específico está marcado. Siga o bloco TEMA ATIVO abaixo no conteúdo principal (não apenas no especialista)." : "NÃO — o campo não está marcado. Não trate de dízimos, ofertas ou primícias, mesmo que o tema, a passagem ou o contexto pastoral mencionem o assunto."}
 
 ${request.textoBase
   ? "MODO SERMÃO COM PASSAGEM: exegese para pregação VERSÍCULO A VERSÍCULO. Sem ilustrações. Parágrafos de no máximo 4 frases."

@@ -23,6 +23,9 @@ Siga **exatamente** esta ordem dentro de cada seção numerada do percurso. Não
 
 > “[citação ARA do versículo deste movimento]” ([Referência])
 
+### Tradução
+Uma linha mais literal. Se a palavra carregar o ponto: escrita + transliteração + sentido.
+
 [3 a 6 linhas isoladas — o que a cena faz, em frases curtas, como golpe de púlpito]
 
 ➡️ [afirmação 1 — concreta, paralela]
@@ -31,6 +34,9 @@ Siga **exatamente** esta ordem dentro de cada seção numerada do percurso. Não
 
 ### Contexto
 4 a 8 linhas: o chão histórico, literário ou da cena **desta** virada — quem, a quem, o que estava em jogo então. Sem tratado de autor/data.
+
+### Teologia
+2 a 4 linhas: o que este versículo diz de Deus, da aliança ou da fé. Uma ideia, nascida do texto.
 
 **Textos que iluminam** — 2 a 3 passagens (não só o versículo do título). Cada uma:
 - referência + citação breve em \`>\` **ou** uma linha de conexão

@@ -15,7 +15,6 @@ const os = require("os");
 const ROOT = path.resolve(__dirname, "..");
 const DIST = path.join(ROOT, "dist-web");
 const DEPLOY_ASSETS = path.join(ROOT, "deploy");
-const PROXY_SRC = path.join(ROOT, "proxy", "openai.php");
 const ZIP_NAME = "sermao-deploy.zip";
 const ZIP_PATH = path.join(ROOT, ZIP_NAME);
 const OUT_DIR = path.join(ROOT, "sermao-deploy");
@@ -41,14 +40,12 @@ function copyDir(src, dest) {
 
 function syncUploadFolder() {
   fs.rmSync(OUT_DIR, { recursive: true, force: true });
-  fs.mkdirSync(path.join(OUT_DIR, "assets"), { recursive: true });
-  copyFile(path.join(DIST, "index.html"), path.join(OUT_DIR, "index.html"));
-  copyDir(path.join(DIST, "assets"), path.join(OUT_DIR, "assets"));
-  if (fs.existsSync(path.join(DIST, "bible"))) {
-    copyDir(path.join(DIST, "bible"), path.join(OUT_DIR, "bible"));
-  }
-  if (fs.existsSync(ZIP_PATH)) {
-    fs.copyFileSync(ZIP_PATH, path.join(OUT_DIR, ZIP_NAME));
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  for (const name of fs.readdirSync(DIST)) {
+    const from = path.join(DIST, name);
+    const to = path.join(OUT_DIR, name);
+    if (fs.statSync(from).isDirectory()) copyDir(from, to);
+    else copyFile(from, to);
   }
 }
 
@@ -57,26 +54,25 @@ function makeZip() {
 
   if (process.platform === "win32") {
     execSync(
-      `powershell -Command "Compress-Archive -Path '${DIST}\\*' -DestinationPath '${ZIP_PATH}' -Force"`,
+      `powershell -Command "Compress-Archive -Path '${OUT_DIR}\\*' -DestinationPath '${ZIP_PATH}' -Force"`,
       { cwd: ROOT, stdio: "inherit" }
     );
     return;
   }
 
   execSync(`zip -r "${ZIP_PATH}" . -x "*.DS_Store"`, {
-    cwd: DIST,
+    cwd: OUT_DIR,
     stdio: "inherit",
   });
 }
 
 function listTree() {
-  const rows = ["   ├── index.html", "   ├── .htaccess", "   ├── LEIA-ME.txt", "   ├── assets/"];
-  if (fs.existsSync(path.join(DIST, "bible"))) rows.push("   ├── bible/");
-  if (fs.existsSync(path.join(DIST, "proxy", "openai.php"))) {
-    rows.push("   └── proxy/");
-    rows.push("       └── openai.php  ← não reenvie se a chave no servidor já está certa");
-  }
-  return rows.join("\n");
+  if (!fs.existsSync(OUT_DIR)) return "   (pasta vazia)";
+  return fs
+    .readdirSync(OUT_DIR)
+    .filter((name) => name !== ZIP_NAME)
+    .map((name) => `   ├── ${name}${fs.statSync(path.join(OUT_DIR, name)).isDirectory() ? "/" : ""}`)
+    .join("\n");
 }
 
 log("Fazendo build de produção (npm run build:web)…");
@@ -98,25 +94,32 @@ if (fs.existsSync(proxyIni)) {
 log("Copiando LEIA-ME.txt…");
 copyFile(path.join(DEPLOY_ASSETS, "LEIA-ME.txt"), path.join(DIST, "LEIA-ME.txt"));
 
-if (fs.existsSync(PROXY_SRC)) {
-  log("Copiando proxy/openai.php…");
-  copyFile(PROXY_SRC, path.join(DIST, "proxy", "openai.php"));
-} else {
-  log("proxy/openai.php não encontrado — o zip sai sem proxy (não sobrescreva o do servidor).");
+const deployPhpIni = path.join(DEPLOY_ASSETS, "php.ini");
+if (fs.existsSync(deployPhpIni)) {
+  log("Copiando php.ini…");
+  copyFile(deployPhpIni, path.join(DIST, "php.ini"));
 }
 
-log(`Gerando ${ZIP_NAME}…`);
-makeZip();
+if (fs.existsSync(path.join(ROOT, "proxy"))) {
+  log("Copiando pasta proxy/ (vai junto para substituir no ar)…");
+  for (const name of fs.readdirSync(path.join(ROOT, "proxy"))) {
+    if (name.endsWith(".example")) continue;
+    copyFile(path.join(ROOT, "proxy", name), path.join(DIST, "proxy", name));
+  }
+}
 
-log("Copiando pasta sermao-deploy/ (pronta para upload)…");
+log("Montando pasta sermao-deploy/ pronta para enviar por cima…");
 syncUploadFolder();
+
+log(`Gerando ${ZIP_NAME} na raiz (não entra na pasta de upload)…`);
+makeZip();
 
 if (fs.existsSync(ZIP_PATH) && fs.existsSync(path.join(OUT_DIR, "index.html"))) {
   const size = (fs.statSync(ZIP_PATH).size / 1024).toFixed(1);
   console.log(`\n${"═".repeat(50)}`);
   console.log(`✓  Pacote gerado com sucesso!`);
-  console.log(`   Pasta:   sermao-deploy/  ← envie index.html + assets/`);
-  console.log(`   Zip:     sermao-deploy/${ZIP_NAME} (${size} KB)`);
+  console.log(`   Pasta:   sermao-deploy/  ← mande esta pasta inteira por cima da que está no ar`);
+  console.log(`   Zip:     ${ZIP_NAME} na raiz do projeto (${size} KB) — não precisa enviar`);
   console.log(`   Sistema: ${os.platform()}`);
   console.log(`\n   Conteúdo do pacote:`);
   console.log(listTree());

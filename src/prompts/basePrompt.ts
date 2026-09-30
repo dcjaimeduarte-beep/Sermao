@@ -20,10 +20,15 @@ COMO APLICAR CADA INSTRUÇÃO DO PEDIDO
 ════════════════════════════════════════
 
 ▸ TIPO DE CONTEÚDO
-  Leia o campo "TIPO DE CONTEÚDO" e siga a estrutura correspondente SEM DESVIAR:
-  - sermao   → Manuscrito numerado: cabeçalho + **# 1. INTRODUÇÃO** (livro + palavra/tema) + blocos-tipo (citação, cena, textos, contexto, aplicação, palavra). Sem ilustrações. Sem molde I/II/III.
-  - esboco   → Mesmo layout numerado: **# 1. INTRODUÇÃO** (livro + palavra/tema) + blocos de percurso com setas ➡️. Ferramenta de púlpito. Expositivo, textual e temático usam essa introdução (sabor diferente).
-  - estudo   → Mesmo layout: **# 1. INTRODUÇÃO** (livro + palavra/tema + pergunta) + blocos didáticos. Sem setas.
+  Sermão, esboço, estudo e a fundação (exegeta, teólogo, esboçista, pregador) usam o MESMO BLOCO RICO. O que muda é o uso (púlpito, grupo ou pesquisa), não a pobreza do texto.
+  - sermao   → Esboço rico de púlpito: cabeçalho + **# 1. INTRODUÇÃO** + blocos com texto, tradução, contexto, teologia, textos que iluminam e aplicação.
+  - esboco   → O mesmo bloco rico, com setas ➡️.
+  - estudo   → O mesmo bloco rico, mais nota ao líder, perguntas e dinâmica. Sem setas.
+  - fundação → A pesquisa especializada também traz texto ARA, tradução/original, contexto, teologia e aplicação. Não é ficha de uma linha.
+
+▸ BLOCO RICO — OBRIGATÓRIO EM CADA MOVIMENTO
+  Texto (citação ARA) + Tradução (linha mais literal; original com escrita, transliteração e sentido quando a palavra carregar o ponto) + Contexto da cena + Teologia (o que o versículo diz de Deus) + Aplicação (persona e o que o texto pede).
+  Proibido contexto de uma frase ou paralelo sem citação.
 
 ▸ TIPO DE SERMÃO / TIPO DE ESBOÇO (sabor, não molde I-II-III — o bloco-tipo é o mesmo nos três)
   - expositivo → Ordem do texto; cada virada é um bloco-tipo completo (citação, cena, textos, contexto, aplicação, palavra)
@@ -49,7 +54,7 @@ COMO APLICAR CADA INSTRUÇÃO DO PEDIDO
   - 60+ min    → 8–12 blocos de percurso
 
 ▸ CONTEXTO PASTORAL
-  Se informado, deixe colorir o tom e a ênfase da aplicação. Sem inventar histórias ilustrativas.
+  Se informado, é briefing de enriquecimento — não nota de tom. A situação escrita pede contexto histórico, passagens, traduções, exegese e aplicação, tecidos no formato do tipo (no sermão, dentro dos blocos). Sem história ilustrativa. Se não informado, não invente situação de igreja.
 
 ▸ INCLUSÕES OPCIONAIS — SEGUIR RIGOROSAMENTE:
   - INCLUIR CONTEXTO HISTÓRICO E LITERÁRIO: NÃO → Omita seções de contexto histórico e literário; não mencione data, autor, destinatários em seções separadas

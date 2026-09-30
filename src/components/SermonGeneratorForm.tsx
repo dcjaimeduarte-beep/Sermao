@@ -10,9 +10,9 @@ import { BiblePassageModal } from "./BiblePassageModal";
 import { BibleReader } from "./BibleReader";
 
 const CONTENT_TYPE_OPTIONS: { value: ContentType; label: string; desc: string }[] = [
-  { value: "sermao", label: "Sermão", desc: "Manuscrito numerado: tópicos, contexto, original e palavra profética" },
-  { value: "esboco", label: "Esboço", desc: "Mesmo layout numerado, em versão de púlpito: tópicos, setas e palavra profética" },
-  { value: "estudo", label: "Estudo Bíblico", desc: "Mesmo layout numerado, em versão didática: perguntas, dinâmica e palavra profética" },
+  { value: "sermao", label: "Sermão", desc: "Esboço rico de púlpito: texto, tradução, contexto, teologia e aplicação" },
+  { value: "esboco", label: "Esboço", desc: "O mesmo bloco rico, com setas: texto, tradução, contexto, teologia e aplicação" },
+  { value: "estudo", label: "Estudo Bíblico", desc: "O mesmo bloco rico, para o grupo: texto, tradução, contexto, teologia, aplicação e perguntas" },
 ];
 
 const PUBLICO_OPTIONS: { value: AudienceType; label: string }[] = [
@@ -1123,11 +1123,16 @@ export function SermonGeneratorForm() {
             <label className="sgf-field">
               <span>Contexto pastoral</span>
               <textarea
-                rows={3}
-                placeholder="Situação da igreja, série temática, calendário litúrgico, tom desejado, objetivos pastorais…"
+                rows={4}
+                placeholder="ex.: Igreja enlutada; série sobre esperança; consolo fiel ao texto, com o original da palavra e aplicação para quem está cansado de esperar."
                 value={contexto}
                 onChange={(e) => setContexto(e.target.value)}
               />
+              <span className="sgf-field-hint">
+                {tipoConteudo === "sermao"
+                  ? "Enriquece o sermão com a situação que você escrever. Quando as palavras casam, entram verbetes do dicionário e da enciclopédia: histórico, passagens, traduções, exegese e aplicação."
+                  : "Enriquece o material com a situação que você escrever e, quando couber, com os verbetes do dicionário e da enciclopédia."}
+              </span>
             </label>
           </div>
         </section>
@@ -1187,7 +1192,7 @@ export function SermonGeneratorForm() {
               <span className="sgf-check-box" />
               <span>🤲 Dizimar, ofertar e primiciar (toda a Bíblia)</span>
             </label>
-            <span className="sgf-mordomia-hint">Lê a Bíblia inteira: dizimar, ofertar e primiciar como atos (não só Malaquias nem só versículos com a palavra “dízimo”). Liga sozinho se o tema ou a passagem já falarem disso.</span>
+            <span className="sgf-mordomia-hint">Só entra se este campo estiver marcado. Aí lê a Bíblia inteira: dizimar, ofertar e primiciar como atos (não só Malaquias nem só versículos com a palavra “dízimo”).</span>
           </div>
         </section>
 

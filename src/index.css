@@ -302,6 +302,12 @@ body { margin: 0; min-height: 100vh; }
   color: var(--text-4);
   font-size: .76rem;
 }
+.sgf-field > .sgf-field-hint {
+  font-size: .78rem;
+  font-weight: 400;
+  color: var(--text-3, #888);
+  line-height: 1.4;
+}
 .sgf-field input,
 .sgf-field select,
 .sgf-field textarea {
